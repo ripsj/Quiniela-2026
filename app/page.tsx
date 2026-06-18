@@ -9,6 +9,7 @@ import { SHEETS } from "@/lib/sheets";
 import { buildRanking } from "@/lib/ranking";
 import KpiCard from "@/components/KpiCard";
 import RankingTable from "@/components/RankingTable";
+import Podium from "@/components/Podium";
 
 export default async function Home() {
 
@@ -36,29 +37,57 @@ export default async function Home() {
       predictions
     );
 
-  console.log(matches[0]);
-  console.log(predictions[0]);
-  console.log(participants[0]);
+  
 
   return (
-    <main className="p-8">
+    <main className="mx-auto max-w-6xl p-6">
 
-      <h1 className="text-4xl font-bold mb-8">
-        Quiniela Mundial 2026
+      <h1 className="mb-6 text-4xl font-bold">
+        🏆 Quiniela Mundial 2026
       </h1>
 
-      <div className="grid grid-cols-2 gap-4 mb-8">
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+
         <KpiCard
           title="Líder"
-          value={ranking[0]?.nombre ?? "-"}
+          value={ranking[0]?.nombre}
         />
+
         <KpiCard
           title="Participantes"
           value={ranking.length}
         />
+
+        <KpiCard
+          title="Partidos Jugados"
+          value={
+            matches.filter(
+              m =>
+                m.goles_local !== null &&
+                m.goles_visitante !== null
+            ).length
+          }
+        />
+
+        <KpiCard
+          title="Puntos Totales"
+          value={
+            ranking.reduce(
+              (sum, p) =>
+                sum + p.puntos,
+              0
+            )
+          }
+        />
+
+      </div>
+
+      <div className="my-6">
+        <Podium ranking={ranking} />
       </div>
 
       <RankingTable ranking={ranking} />
+
     </main>
   );
 }
