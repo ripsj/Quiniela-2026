@@ -14,6 +14,8 @@ import RankingHistoryChart from "@/components/RankingHistoryChart";
 import { buildRankingHistory } from "@/lib/rankingHistory";
 import { buildPointsHistory }
 from "@/lib/pointsHistory";
+import { buildStats } from "@/lib/stats";
+import StatsSection from "@/components/StatsSection";
 
 import PointsHistoryChart
 from "@/components/PointsHistoryChart";
@@ -58,6 +60,19 @@ export default async function Home() {
     predictions
   );
 
+  const partidosJugados =
+    matches.filter(
+      (m) => m.finalizado === "TRUE"
+    ).length;
+
+  const stats =
+  buildStats(
+    ranking,
+    partidosJugados,
+    matches,
+    predictions,
+    participants
+  );
   return (
     <main className="mx-auto max-w-7xl p-4 md:p-8">
 
@@ -71,12 +86,11 @@ export default async function Home() {
         </p>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+      <div className="mt-8 mb-8">
+        <Podium ranking={ranking} />
+      </div>
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
 
-        <KpiCard
-          title="Líder"
-          value={ranking[0]?.nombre ?? "-"}
-        />
 
         <KpiCard
           title="Participantes"
@@ -103,9 +117,9 @@ export default async function Home() {
 
       </div>
 
-      <div className="mt-8 mb-8">
-        <Podium ranking={ranking} />
-      </div>
+      <StatsSection
+        stats={stats}
+      />
 
       <div className="mb-4">
         <h2 className="text-2xl font-bold text-slate-900">

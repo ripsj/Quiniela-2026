@@ -6,6 +6,7 @@ export interface Participant {
 export interface Match {
   id: string;
   fecha?: string;
+  dia: string;
   equipo_local: string;
   equipo_visitante: string;
   goles_local: string;
