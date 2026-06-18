@@ -15,7 +15,8 @@ export default function Podium({
           rounded-2xl
           border
           border-slate-300
-          bg-white
+          bg-white/95
+          backdrop-blur-sm
           p-4
           text-center
           shadow-lg
@@ -23,6 +24,9 @@ export default function Podium({
           flex
           flex-col
           justify-center
+          bg-gradient-to-b
+          from-slate-200
+          to-slate-50
         "
       >
         <div className="text-4xl">🥈</div>
@@ -49,6 +53,9 @@ export default function Podium({
           flex
           flex-col
           justify-center
+          bg-gradient-to-b
+          from-yellow-200
+          to-yellow-50
         "
       >
         <div className="text-5xl">🥇</div>
@@ -74,7 +81,9 @@ export default function Podium({
           h-32
           flex
           flex-col
-          justify-center
+          justify-centerbg-gradient-to-b
+          from-orange-200
+          to-orange-50
         "
       >
         <div className="text-4xl">🥉</div>

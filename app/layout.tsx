@@ -26,7 +26,10 @@ export default function RootLayout({
         className={`
           ${poppins.className}
           min-h-screen
-          bg-slate-100
+          bg-gradient-to-br
+          from-[#001F5B]
+          via-[#003C8F]
+          to-[#8B1538]
         `}
       >
         {children}

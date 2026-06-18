@@ -58,7 +58,8 @@ export default function RankingHistoryChart({
     const players = selectedPlayers;
 
   return (
-    <div className="rounded-2xl bg-white p-6 shadow-lg border border-slate-200">
+    <div className="rounded-2xl bg-white/95
+        backdrop-blur-sm p-6 shadow-lg border border-slate-200">
 
         <h2 className="
         mb-2

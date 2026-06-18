@@ -15,7 +15,8 @@ export default function RankingTable({
       className="
         overflow-hidden
         rounded-2xl
-        bg-white
+        bg-white/95
+        backdrop-blur-sm
         shadow-lg
         border
         border-slate-200
@@ -23,7 +24,10 @@ export default function RankingTable({
     >
       <table className="w-full">
         <thead>
-          <tr className="bg-slate-900 text-white">
+          <tr className="bg-gradient-to-r
+            from-[#001F5B]
+            to-[#8B1538]
+            text-white">
             <th className="p-4 text-left">
               #
             </th>
@@ -45,7 +49,10 @@ export default function RankingTable({
             </th>
 
             <th className="p-4 text-right">
-              Dif.
+              Diferencia al líder
+            </th>
+            <th className="p-4 text-center">
+              Forma
             </th>
           </tr>
         </thead>
@@ -90,6 +97,9 @@ export default function RankingTable({
                 <td className="p-4 text-right text-slate-500">
                   {player.puntos -
                     leaderPoints}
+                </td>
+                <td className="p-4 text-center">
+                  {player.forma?.join(" ")}
                 </td>
               </tr>
             )

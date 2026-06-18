@@ -94,19 +94,11 @@ export function buildStats(
 
   const mejorDelta =
     [...deltaMap.values()]
-      .map((p) => ({
-        ...p,
-        promedio:
-          p.partidos > 0
-            ? p.totalDelta /
-              p.partidos
-            : 999,
-      }))
       .sort(
         (a, b) =>
-          a.promedio -
-          b.promedio
-      )[0];
+            a.totalDelta -
+            b.totalDelta
+        )[0];
 
   const ultimoDia =
     completedMatches

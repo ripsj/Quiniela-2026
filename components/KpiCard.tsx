@@ -11,7 +11,8 @@ export default function KpiCard({
     <div
       className="
         rounded-2xl
-        bg-white
+        bg-white/95
+        backdrop-blur-sm
         p-5
         shadow-lg
         border

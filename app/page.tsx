@@ -15,7 +15,11 @@ import { buildRankingHistory } from "@/lib/rankingHistory";
 import { buildPointsHistory }
 from "@/lib/pointsHistory";
 import { buildStats } from "@/lib/stats";
+import { buildRecentForm } from "@/lib/recentForm";
 import StatsSection from "@/components/StatsSection";
+import {
+  buildComebacks,
+} from "@/lib/comebacks";
 
 import PointsHistoryChart
 from "@/components/PointsHistoryChart";
@@ -64,6 +68,11 @@ export default async function Home() {
     matches.filter(
       (m) => m.finalizado === "TRUE"
     ).length;
+  
+    const comeback =
+    buildComebacks(
+      rankingHistory
+    );
 
   const stats =
   buildStats(
@@ -73,6 +82,20 @@ export default async function Home() {
     predictions,
     participants
   );
+
+  const recentForm =
+  buildRecentForm(
+    participants,
+    matches,
+    predictions
+  );
+
+  ranking.forEach((player) => {
+    player.forma =
+      recentForm.get(
+        String(player.participanteId)
+      ) ?? [];
+  });
   return (
     <main className="mx-auto max-w-7xl p-4 md:p-8">
 
@@ -89,7 +112,7 @@ export default async function Home() {
       <div className="mt-8 mb-8">
         <Podium ranking={ranking} />
       </div>
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-3 mb-4">
 
 
         <KpiCard
@@ -117,10 +140,6 @@ export default async function Home() {
 
       </div>
 
-      <StatsSection
-        stats={stats}
-      />
-
       <div className="mb-4">
         <h2 className="text-2xl font-bold text-slate-900">
           Ranking General
@@ -129,6 +148,13 @@ export default async function Home() {
 
       <RankingTable ranking={ranking} />
       
+
+      <StatsSection
+        stats={{
+          ...stats,
+          comeback
+        }}
+      />
       <div className="mt-8">
         <RankingHistoryChart
           data={rankingHistory}

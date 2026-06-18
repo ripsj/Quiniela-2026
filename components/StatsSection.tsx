@@ -3,9 +3,10 @@ interface Props {
     masExactos: any;
     mejorDelta: any;
     jugadorDelDia: any;
+    comeback: any;
   };
 }
-
+import StatTooltip from "./StatTooltip";
 export default function StatsSection({
   stats,
 }: Props) {
@@ -16,12 +17,23 @@ export default function StatsSection({
         🏅 Estadísticas
       </h2>
 
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-4">
 
-        <div className="rounded-2xl bg-white p-5 shadow-lg border border-slate-200">
-          <div className="text-sm text-slate-500">
-            🎯 Más marcadores exactos
-          </div>
+        <div className="rounded-2xl bg-white/95
+            backdrop-blur-sm p-5 shadow-lg border border-slate-200">
+          <div className="flex items-center justify-between">
+
+            <span className="text-sm text-slate-500">
+                🎯 Más marcadores exactos
+            </span>
+
+            <StatTooltip
+                text="
+                Cantidad de marcadores exactos acertados durante el torneo.
+                "
+            />
+
+            </div>
 
           <div className="mt-2 text-lg font-bold text-slate-900">
             {stats.masExactos?.nombre}
@@ -32,24 +44,45 @@ export default function StatsSection({
           </div>
         </div>
 
-        <div className="rounded-2xl bg-white p-5 shadow-lg border border-slate-200">
-          <div className="text-sm text-slate-500">
-            ⚖️ Mejor delta de goles
-          </div>
+        <div className="rounded-2xl bg-white/95
+            backdrop-blur-sm p-5 shadow-lg border border-slate-200">
+          <div className="flex items-center justify-between">
+
+            <span className="text-sm text-slate-500">
+                ⚽ Pronóstico más preciso
+            </span>
+
+            <StatTooltip
+                text="
+                    Cantidad de goles predecidos menos los goles del marcador final. Menor valor es mejor."
+            />
+
+            </div>
 
           <div className="mt-2 text-lg font-bold text-slate-900">
             {stats.mejorDelta?.nombre}
           </div>
 
           <div className="text-slate-500">
-            {stats.mejorDelta?.promedio.toFixed(2)} promedio
+            {stats.mejorDelta?.totalDelta} goles
           </div>
         </div>
 
-        <div className="rounded-2xl bg-white p-5 shadow-lg border border-slate-200">
-          <div className="text-sm text-slate-500">
-            🔥 Jugador del día
-          </div>
+        <div className="rounded-2xl bg-white/95
+            backdrop-blur-sm p-5 shadow-lg border border-slate-200">
+          <div className="flex items-center justify-between">
+
+            <span className="text-sm text-slate-500">
+                🔥 Jugador del día
+            </span>
+
+            <StatTooltip
+                text="
+                Participante con más resultados acertados en la jornada más reciente. Los empates se resuelven con exactos y puntos.
+                "
+            />
+
+            </div>
 
           <div className="mt-2 text-lg font-bold text-slate-900">
             {stats.jugadorDelDia?.nombre}
@@ -64,7 +97,37 @@ export default function StatsSection({
           </div>
         </div>
 
-      </div>
+        <div className="rounded-2xl bg-white/95
+            backdrop-blur-sm p-5 shadow-lg border border-slate-200">
+
+            <div className="flex items-center justify-between">
+
+            <span className="text-sm text-slate-500">
+                📈 Mayor remontada
+            </span>
+
+            <StatTooltip
+                text="
+                Participante que más posiciones ha ganado en el ranking desde el inicio del torneo.
+                "
+            />
+
+            </div>
+
+            <div className="mt-2 text-lg font-bold text-slate-900">
+                {stats.comeback?.nombre}
+            </div>
+
+            <div className="text-slate-500">
+                {stats.comeback?.inicio}° ➜ {stats.comeback?.actual}°
+            </div>
+
+            <div className="text-emerald-600 font-medium">
+                +{stats.comeback?.mejora}
+            </div>
+
+            </div>
+        </div>
 
     </div>
   );

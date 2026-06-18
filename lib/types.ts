@@ -27,4 +27,5 @@ export interface RankingEntry {
   puntos: number;
   exactos: number;
   resultados: number;
+  forma?: string[];
 }
