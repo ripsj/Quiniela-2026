@@ -10,6 +10,7 @@ export interface Match {
   equipo_visitante: string;
   goles_local: string;
   goles_visitante: string;
+  finalizado: string;
 }
 
 export interface Prediction {

@@ -8,12 +8,23 @@ export default function KpiCard({
   value,
 }: Props) {
   return (
-    <div className="rounded-xl border bg-white p-4 shadow-sm">
-      <div className="text-sm text-gray-500">
+    <div
+      className="
+        rounded-2xl
+        bg-white
+        p-5
+        shadow-lg
+        border
+        border-slate-200
+        transition
+        hover:shadow-xl
+      "
+    >
+      <div className="text-sm font-medium text-slate-500">
         {title}
       </div>
 
-      <div className="mt-2 text-2xl font-bold">
+      <div className="mt-3 text-3xl font-extrabold text-slate-900">
         {value}
       </div>
     </div>

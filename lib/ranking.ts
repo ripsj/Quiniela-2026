@@ -29,6 +29,9 @@ export function buildRanking(
   });
 
   matches.forEach((match) => {
+    if (match.finalizado !== "TRUE") {
+      return;
+    }
 
     if (
         match.goles_local == null ||

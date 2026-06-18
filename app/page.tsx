@@ -40,17 +40,23 @@ export default async function Home() {
   
 
   return (
-    <main className="mx-auto max-w-6xl p-6">
+    <main className="mx-auto max-w-7xl p-4 md:p-8">
 
-      <h1 className="mb-6 text-4xl font-bold">
-        🏆 Quiniela Mundial 2026
-      </h1>
+      <div className="mb-10 text-center">
+        <h1 className="text-4xl md:text-6xl font-extrabold text-slate-900">
+          🏆 Quiniela Mundial 2026
+        </h1>
+
+        <p className="mt-3 text-lg text-slate-500">
+          Ranking en tiempo real
+        </p>
+      </div>
 
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
 
         <KpiCard
           title="Líder"
-          value={ranking[0]?.nombre}
+          value={ranking[0]?.nombre ?? "-"}
         />
 
         <KpiCard
@@ -62,28 +68,30 @@ export default async function Home() {
           title="Partidos Jugados"
           value={
             matches.filter(
-              m =>
-                m.goles_local !== null &&
-                m.goles_visitante !== null
+              m => m.finalizado === "TRUE"
             ).length
           }
         />
 
         <KpiCard
-          title="Puntos Totales"
+          title="Puntos Máximos Posibles"
           value={
-            ranking.reduce(
-              (sum, p) =>
-                sum + p.puntos,
-              0
-            )
+            matches.filter(
+              m => m.finalizado === "TRUE"
+            ).length * 2
           }
         />
 
       </div>
 
-      <div className="my-6">
+      <div className="mt-8 mb-8">
         <Podium ranking={ranking} />
+      </div>
+
+      <div className="mb-4">
+        <h2 className="text-2xl font-bold text-slate-900">
+          Ranking General
+        </h2>
       </div>
 
       <RankingTable ranking={ranking} />
