@@ -24,6 +24,7 @@ import {
 import PointsHistoryChart
 from "@/components/PointsHistoryChart";
 import { Analytics } from "@vercel/analytics/next"
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 export default async function Home() {
 
@@ -178,6 +179,7 @@ export default async function Home() {
         />
       </div>
       <Analytics />
+       <SpeedInsights />
     </main>
   );
 }
