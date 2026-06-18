@@ -97,8 +97,13 @@ export default async function Home() {
       ) ?? [];
   });
   return (
-    <main className="mx-auto max-w-7xl p-4 md:p-8">
-
+    <main className="
+    relative
+    mx-auto
+    max-w-7xl
+    p-4
+    md:p-8
+    ">
       <div className="mb-10 text-center">
         <h1 className="text-4xl md:text-6xl font-extrabold text-slate-900">
           🏆 Quiniela Mundial 2026
@@ -112,7 +117,13 @@ export default async function Home() {
       <div className="mt-8 mb-8">
         <Podium ranking={ranking} />
       </div>
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-3 mb-4">
+      <div className="
+      mb-4
+      grid
+      gap-4
+      grid-cols-1
+      sm:grid-cols-2
+      lg:grid-cols-3">
 
 
         <KpiCard
@@ -142,7 +153,7 @@ export default async function Home() {
 
       <div className="mb-4">
         <h2 className="text-2xl font-bold text-slate-900">
-          Ranking General
+          🏆 Clasificación General
         </h2>
       </div>
 

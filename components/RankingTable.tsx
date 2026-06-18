@@ -13,16 +13,16 @@ export default function RankingTable({
   return (
     <div
       className="
-        overflow-hidden
-        rounded-2xl
-        bg-white/95
-        backdrop-blur-sm
-        shadow-lg
-        border
-        border-slate-200
+      overflow-x-auto
+      scroll-smooth
+      rounded-2xl
+      border
+      border-white/20
+      bg-white/95
+      backdrop-blur-sm
       "
     >
-      <table className="w-full">
+      <table className="min-w-[900px] w-full">
         <thead>
           <tr className="bg-gradient-to-r
             from-[#001F5B]
@@ -98,8 +98,11 @@ export default function RankingTable({
                   {player.puntos -
                     leaderPoints}
                 </td>
-                <td className="p-4 text-center">
-                  {player.forma?.join(" ")}
+                <td className="
+                p-3
+                text-center
+                whitespace-nowrap">
+                  {player.forma?.join("")}
                 </td>
               </tr>
             )
