@@ -12,6 +12,11 @@ import RankingTable from "@/components/RankingTable";
 import Podium from "@/components/Podium";
 import RankingHistoryChart from "@/components/RankingHistoryChart";
 import { buildRankingHistory } from "@/lib/rankingHistory";
+import { buildPointsHistory }
+from "@/lib/pointsHistory";
+
+import PointsHistoryChart
+from "@/components/PointsHistoryChart";
 
 export default async function Home() {
 
@@ -45,6 +50,13 @@ export default async function Home() {
       matches,
       predictions
     );
+
+  const pointsHistory =
+  buildPointsHistory(
+    participants,
+    matches,
+    predictions
+  );
 
   return (
     <main className="mx-auto max-w-7xl p-4 md:p-8">
@@ -104,10 +116,15 @@ export default async function Home() {
       <RankingTable ranking={ranking} />
       
       <div className="mt-8">
-      <RankingHistoryChart
-        data={rankingHistory}
-      />
-    </div>
+        <RankingHistoryChart
+          data={rankingHistory}
+        />
+      </div>
+      <div className="mt-8">
+        <PointsHistoryChart
+          data={pointsHistory}
+        />
+      </div>
     </main>
   );
 }

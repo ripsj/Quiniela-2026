@@ -47,8 +47,8 @@ export default function RankingHistoryChart({
     [...allPlayers]
         .sort(
         (a, b) =>
-            Number(latest[a]) -
-            Number(latest[b])
+            Number(latest[b]) -
+            Number(latest[a])
         )
         .slice(0, 5);
 
@@ -66,14 +66,14 @@ export default function RankingHistoryChart({
         font-bold
         text-slate-900
         ">
-        📈 Evolución del Ranking
+        📊 Evolución de Puntos
         </h2>
 
         <p className="
         mb-6
         text-slate-500
         ">
-        Posición después de cada partido
+        Puntos acumulados después de cada partido
         </p>
 
         <div className="mb-6">
@@ -205,13 +205,12 @@ export default function RankingHistoryChart({
             />
 
             <YAxis
-              reversed
-              allowDecimals={false}
+            allowDecimals={false}
             />
 
             <Tooltip
             formatter={(value) => [
-                `Posición ${value}`,
+                `${value} puntos`,
                 "",
             ]}
             />
