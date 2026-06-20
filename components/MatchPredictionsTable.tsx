@@ -63,6 +63,22 @@ function getPointsTone(
   return "bg-slate-100 text-slate-500";
 }
 
+function formatRank(index: number) {
+  if (index === 0) {
+    return "🥇";
+  }
+
+  if (index === 1) {
+    return "🥈";
+  }
+
+  if (index === 2) {
+    return "🥉";
+  }
+
+  return index + 1;
+}
+
 export default function MatchPredictionsTable({
   rows,
 }: Props) {
@@ -82,8 +98,8 @@ export default function MatchPredictionsTable({
 
       <div
         className="
-          max-h-[72vh]
-          overflow-auto
+          overflow-x-auto
+          scroll-smooth
           rounded-2xl
           border
           border-white/20
@@ -102,7 +118,10 @@ export default function MatchPredictionsTable({
                 text-white
               "
             >
-              <th className="sticky left-0 top-0 z-40 w-56 bg-[#001F5B] p-4 text-left">
+              <th className="sticky left-0 top-0 z-50 w-12 min-w-12 max-w-12 bg-[#001F5B] px-2 py-4 text-center sm:w-16 sm:min-w-16 sm:max-w-16 sm:p-4">
+                #
+              </th>
+              <th className="sticky left-12 top-0 z-50 w-32 min-w-32 max-w-32 bg-[#001F5B] px-3 py-4 text-left sm:left-16 sm:w-48 sm:min-w-48 sm:max-w-48 sm:p-4 md:w-56 md:min-w-56 md:max-w-56">
                 Jugador
               </th>
               {rows.map((row) => {
@@ -152,17 +171,63 @@ export default function MatchPredictionsTable({
                     participant.participanteId
                   }
                   className="
+                    group
                     border-t
                     border-slate-200
                     transition
                     hover:bg-slate-50
                   "
                 >
-                  <td className="sticky left-0 z-10 bg-white p-4">
-                    <div className="font-bold text-slate-900">
-                      <span className="mr-2 text-slate-400">
-                        {index + 1}
-                      </span>
+                  <td
+                    className="
+                      sticky
+                      left-0
+                      z-20
+                      w-12
+                      min-w-12
+                      max-w-12
+                      bg-white
+                      px-2
+                      py-4
+                      text-center
+                      font-bold
+                      transition
+                      group-hover:bg-slate-50
+                      sm:w-16
+                      sm:min-w-16
+                      sm:max-w-16
+                      sm:p-4
+                    "
+                  >
+                    {formatRank(index)}
+                  </td>
+
+                  <td
+                    className="
+                      sticky
+                      left-12
+                      z-20
+                      w-32
+                      min-w-32
+                      max-w-32
+                      bg-white
+                      px-3
+                      py-4
+                      font-semibold
+                      text-slate-900
+                      transition
+                      group-hover:bg-slate-50
+                      sm:left-16
+                      sm:w-48
+                      sm:min-w-48
+                      sm:max-w-48
+                      sm:p-4
+                      md:w-56
+                      md:min-w-56
+                      md:max-w-56
+                    "
+                  >
+                    <div className="truncate">
                       {participant.nombre}
                     </div>
                   </td>
