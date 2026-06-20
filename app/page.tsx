@@ -20,9 +20,12 @@ import StatsSection from "@/components/StatsSection";
 import {
   buildComebacks,
 } from "@/lib/comebacks";
+import { buildMatchPredictions } from "@/lib/matchPredictions";
 
 import PointsHistoryChart
 from "@/components/PointsHistoryChart";
+import DashboardTabs from "@/components/DashboardTabs";
+import MatchPredictionsTable from "@/components/MatchPredictionsTable";
 import { Analytics } from "@vercel/analytics/next"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 
@@ -92,6 +95,19 @@ export default async function Home() {
     predictions
   );
 
+  const rankedParticipants =
+  ranking.map((player) => ({
+    id: player.participanteId,
+    nombre: player.nombre,
+  }));
+
+  const matchPredictions =
+  buildMatchPredictions(
+    rankedParticipants,
+    matches,
+    predictions
+  );
+
   ranking.forEach((player) => {
     player.forma =
       recentForm.get(
@@ -116,68 +132,89 @@ export default async function Home() {
         </p>
       </div>
 
-      <div className="mt-8 mb-8">
-        <Podium ranking={ranking} />
-      </div>
-      <div className="
-      mb-4
-      grid
-      gap-4
-      grid-cols-1
-      sm:grid-cols-2
-      lg:grid-cols-3">
+      <DashboardTabs
+        tabs={[
+          {
+            id: "ranking",
+            label: "Ranking",
+            content: (
+              <>
+                <div className="mt-8 mb-8">
+                  <Podium ranking={ranking} />
+                </div>
+                <div className="
+                mb-4
+                grid
+                gap-4
+                grid-cols-1
+                sm:grid-cols-2
+                lg:grid-cols-3">
 
 
-        <KpiCard
-          title="Participantes"
-          value={ranking.length}
-        />
+                  <KpiCard
+                    title="Participantes"
+                    value={ranking.length}
+                  />
 
-        <KpiCard
-          title="Partidos Jugados"
-          value={
-            matches.filter(
-              m => m.finalizado === "TRUE"
-            ).length
-          }
-        />
+                  <KpiCard
+                    title="Partidos Jugados"
+                    value={
+                      matches.filter(
+                        m => m.finalizado === "TRUE"
+                      ).length
+                    }
+                  />
 
-        <KpiCard
-          title="Puntos Máximos Posibles"
-          value={
-            matches.filter(
-              m => m.finalizado === "TRUE"
-            ).length * 2
-          }
-        />
+                  <KpiCard
+                    title="Puntos Máximos Posibles"
+                    value={
+                      matches.filter(
+                        m => m.finalizado === "TRUE"
+                      ).length * 2
+                    }
+                  />
 
-      </div>
+                </div>
 
-      <div className="mb-4">
-        <h2 className="text-2xl font-bold text-slate-900">
-          🏆 Clasificación General
-        </h2>
-      </div>
+                <div className="mb-4">
+                  <h2 className="text-2xl font-bold text-slate-900">
+                    🏆 Clasificación General
+                  </h2>
+                </div>
 
-      <RankingTable ranking={ranking} />
-      
+                <RankingTable ranking={ranking} />
+                
 
-      <StatsSection
-        stats={{
-          ...stats,
-          comeback
-        }}
+                <StatsSection
+                  stats={{
+                    ...stats,
+                    comeback
+                  }}
+                />
+                <div className="mt-8">
+                  <RankingHistoryChart
+                    data={rankingHistory}
+                  />
+                </div>
+                <div className="mt-8">
+                  <PointsHistoryChart
+                    data={pointsHistory}
+                  />
+                </div>
+              </>
+            ),
+          },
+          {
+            id: "partidos",
+            label: "Partidos",
+            content: (
+              <MatchPredictionsTable
+                rows={matchPredictions}
+              />
+            ),
+          },
+        ]}
       />
-      <div className="mt-8">
-        <RankingHistoryChart
-          data={rankingHistory}
-        />
-      </div>
-      <div className="mt-8">
-        <PointsHistoryChart
-          data={pointsHistory}
-        />
-      </div>
       <Analytics />
        <SpeedInsights />
     </main>
