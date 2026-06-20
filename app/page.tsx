@@ -132,6 +132,43 @@ export default async function Home() {
         </p>
       </div>
 
+      <div className="mt-8 mb-8">
+        <Podium ranking={ranking} />
+      </div>
+      <div className="
+      mb-4
+      grid
+      gap-4
+      grid-cols-1
+      sm:grid-cols-2
+      lg:grid-cols-3">
+
+
+        <KpiCard
+          title="Participantes"
+          value={ranking.length}
+        />
+
+        <KpiCard
+          title="Partidos Jugados"
+          value={
+            matches.filter(
+              m => m.finalizado === "TRUE"
+            ).length
+          }
+        />
+
+        <KpiCard
+          title="Puntos Máximos Posibles"
+          value={
+            matches.filter(
+              m => m.finalizado === "TRUE"
+            ).length * 2
+          }
+        />
+
+      </div>
+
       <DashboardTabs
         tabs={[
           {
@@ -139,43 +176,6 @@ export default async function Home() {
             label: "Ranking",
             content: (
               <>
-                <div className="mt-8 mb-8">
-                  <Podium ranking={ranking} />
-                </div>
-                <div className="
-                mb-4
-                grid
-                gap-4
-                grid-cols-1
-                sm:grid-cols-2
-                lg:grid-cols-3">
-
-
-                  <KpiCard
-                    title="Participantes"
-                    value={ranking.length}
-                  />
-
-                  <KpiCard
-                    title="Partidos Jugados"
-                    value={
-                      matches.filter(
-                        m => m.finalizado === "TRUE"
-                      ).length
-                    }
-                  />
-
-                  <KpiCard
-                    title="Puntos Máximos Posibles"
-                    value={
-                      matches.filter(
-                        m => m.finalizado === "TRUE"
-                      ).length * 2
-                    }
-                  />
-
-                </div>
-
                 <div className="mb-4">
                   <h2 className="text-2xl font-bold text-slate-900">
                     🏆 Clasificación General
@@ -183,24 +183,6 @@ export default async function Home() {
                 </div>
 
                 <RankingTable ranking={ranking} />
-                
-
-                <StatsSection
-                  stats={{
-                    ...stats,
-                    comeback
-                  }}
-                />
-                <div className="mt-8">
-                  <RankingHistoryChart
-                    data={rankingHistory}
-                  />
-                </div>
-                <div className="mt-8">
-                  <PointsHistoryChart
-                    data={pointsHistory}
-                  />
-                </div>
               </>
             ),
           },
@@ -215,6 +197,23 @@ export default async function Home() {
           },
         ]}
       />
+
+      <StatsSection
+        stats={{
+          ...stats,
+          comeback
+        }}
+      />
+      <div className="mt-8">
+        <RankingHistoryChart
+          data={rankingHistory}
+        />
+      </div>
+      <div className="mt-8">
+        <PointsHistoryChart
+          data={pointsHistory}
+        />
+      </div>
       <Analytics />
        <SpeedInsights />
     </main>
