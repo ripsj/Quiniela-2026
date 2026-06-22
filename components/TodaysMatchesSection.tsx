@@ -134,7 +134,7 @@ export default function TodaysMatchesSection({
             Partidos de hoy
           </h2>
           <p className="text-sm capitalize text-slate-500">
-            {dateLabel} · impacto según marcador actual o final
+            {dateLabel}
           </p>
         </div>
       </div>
@@ -251,7 +251,6 @@ export default function TodaysMatchesSection({
                         <span
                           className={`
                             inline-flex
-                            min-w-24
                             items-center
                             justify-center
                             rounded-full
@@ -259,6 +258,7 @@ export default function TodaysMatchesSection({
                             py-0.5
                             text-xs
                             font-bold
+                            sm:min-w-24
                             ${getImpactTone(
                               group.impactPoints
                             )}

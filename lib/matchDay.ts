@@ -3,7 +3,7 @@ import {
 } from "./matchPredictions";
 
 export const MATCH_DAY_TIME_ZONE =
-  "Europe/Madrid";
+  "America/Mexico_City";
 
 export function getTodayDateKey(
   date = new Date(),
