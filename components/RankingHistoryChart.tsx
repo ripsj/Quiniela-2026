@@ -18,13 +18,8 @@ interface Props {
 export default function RankingHistoryChart({
   data,
 }: Props) {
-    
-  if (!data.length) {
-    return null;
-  }
-
-    const [search, setSearch] =
-    useState("");
+    const [selectedPlayers, setSelectedPlayers] =
+    useState<string[]>([]);
 
     const COLORS = [
         "#2563eb",
@@ -34,14 +29,16 @@ export default function RankingHistoryChart({
         "#9333ea",
     ];
 
-    const allPlayers = Object.keys(
+    const allPlayers = data.length
+    ? Object.keys(
     data[0]
     ).filter(
     (key) => key !== "partido"
-    );
+    )
+    : [];
 
     const latest =
-    data[data.length - 1];
+    data[data.length - 1] ?? {};
 
     const topPlayers =
     [...allPlayers]
@@ -52,14 +49,15 @@ export default function RankingHistoryChart({
         )
         .slice(0, 5);
 
-    const [selectedPlayers, setSelectedPlayers] =
-    useState<string[]>(topPlayers);
-
     const players = selectedPlayers;
+
+  if (!data.length) {
+    return null;
+  }
 
   return (
     <div className="rounded-2xl bg-white/95
-        backdrop-blur-sm p-6 shadow-lg border border-slate-200">
+        backdrop-blur-sm p-3 shadow-lg border border-slate-200 sm:p-6">
 
         <h2 className="
         mb-2
@@ -121,14 +119,6 @@ export default function RankingHistoryChart({
             </option>
 
             {allPlayers
-            .filter(
-                (player) =>
-                player
-                    .toLowerCase()
-                    .includes(
-                    search.toLowerCase()
-                    )
-            )
             .map(
                 (player) => (
                 <option
@@ -174,21 +164,43 @@ export default function RankingHistoryChart({
 
         </div>
 
-        <button
+        <div className="flex flex-wrap gap-2">
+          <button
             className="
             rounded-xl
-            bg-red-100
+            bg-blue-100
             px-4
             py-2
             text-sm
-            hover:bg-red-200
+            font-semibold
+            text-blue-700
+            hover:bg-blue-200
             "
             onClick={() =>
             setSelectedPlayers(topPlayers)
             }
-        >
-            Restaurar Top 5
-        </button>
+          >
+            Top 5
+          </button>
+
+          <button
+            className="
+            rounded-xl
+            bg-slate-100
+            px-4
+            py-2
+            text-sm
+            font-semibold
+            text-slate-700
+            hover:bg-slate-200
+            "
+            onClick={() =>
+            setSelectedPlayers([])
+            }
+          >
+            Limpiar
+          </button>
+        </div>
 
         </div>
 
@@ -199,7 +211,15 @@ export default function RankingHistoryChart({
           height="100%"
           minWidth={0}
         >
-          <LineChart data={data}>
+          <LineChart
+            data={data}
+            margin={{
+              top: 8,
+              right: 12,
+              left: -18,
+              bottom: 8,
+            }}
+          >
 
             <XAxis
               dataKey="partido"
@@ -208,6 +228,7 @@ export default function RankingHistoryChart({
             <YAxis
               reversed
               allowDecimals={false}
+              width={28}
             />
 
             <Tooltip
