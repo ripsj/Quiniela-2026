@@ -2,9 +2,14 @@ import {
   Participant,
   Match,
   Prediction,
+  SpecialPrediction,
+  Scorer,
 } from "@/lib/types";
 
-import { loadCsv } from "@/lib/googleSheets";
+import {
+  loadCsv,
+  loadOptionalCsv,
+} from "@/lib/googleSheets";
 import { SHEETS } from "@/lib/sheets";
 import { buildRanking } from "@/lib/ranking";
 import KpiCard from "@/components/KpiCard";
@@ -30,11 +35,13 @@ from "@/components/PointsHistoryChart";
 import DashboardTabs from "@/components/DashboardTabs";
 import MatchPredictionsTable from "@/components/MatchPredictionsTable";
 import TodaysMatchesSection from "@/components/TodaysMatchesSection";
+import SpecialPredictionsSection from "@/components/SpecialPredictionsSection";
 import {
   filterMatchPredictionsByDate,
   formatDateKeyForDisplay,
   getTodayDateKey,
 } from "@/lib/matchDay";
+import { buildSpecialPredictions } from "@/lib/specialPredictions";
 import { Analytics } from "@vercel/analytics/next"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 
@@ -55,6 +62,16 @@ export default async function Home() {
   const predictions =
     await loadCsv<Prediction>(
       SHEETS.pronosticos
+    );
+
+  const specialPredictionsRows =
+    await loadCsv<SpecialPrediction>(
+      SHEETS.especiales
+    );
+
+  const scorers =
+    await loadOptionalCsv<Scorer>(
+      SHEETS.goleadores
     );
 
   const ranking =
@@ -129,6 +146,12 @@ export default async function Home() {
   filterMatchPredictionsByDate(
     matchPredictions,
     todayDateKey
+  );
+
+  const specialPredictions =
+  buildSpecialPredictions(
+    participants,
+    specialPredictionsRows
   );
 
   ranking.forEach((player) => {
@@ -238,6 +261,16 @@ export default async function Home() {
               />
             ),
           },
+          {
+            id: "especiales",
+            label: "Especiales",
+            content: (
+              <SpecialPredictionsSection
+                categories={specialPredictions}
+                scorers={scorers}
+              />
+            ),
+          },
         ]}
       />
 
@@ -247,16 +280,29 @@ export default async function Home() {
           comeback
         }}
       />
-      <div className="mt-8">
-        <RankingHistoryChart
-          data={rankingHistory}
-        />
-      </div>
-      <div className="mt-8">
-        <PointsHistoryChart
-          data={pointsHistory}
-        />
-      </div>
+
+      <DashboardTabs
+        tabs={[
+          {
+            id: "puntos",
+            label: "Puntos",
+            content: (
+              <PointsHistoryChart
+                data={pointsHistory}
+              />
+            ),
+          },
+          {
+            id: "posiciones",
+            label: "Posiciones",
+            content: (
+              <RankingHistoryChart
+                data={rankingHistory}
+              />
+            ),
+          },
+        ]}
+      />
       <Analytics />
        <SpeedInsights />
     </main>

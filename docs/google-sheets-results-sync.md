@@ -27,7 +27,8 @@ FOOTBALL_DATA_API_TOKEN=tu_token
 6. Ejecuta `previewWorldCupResultSync` una vez para autorizar permisos y revisar logs.
 7. Ejecuta `populateWorldCupExternalMatchIds` para completar `external_match_id` en todos los partidos que crucen por fecha/equipos.
 8. Ejecuta `syncWorldCupResultsFromInternet` para aplicar resultados.
-9. Ejecuta `installWorldCupResultSyncTrigger` para sincronizar cada 15 minutos.
+9. Ejecuta `syncWorldCupScorers` para crear/actualizar la pestaña `goleadores`.
+10. Ejecuta `installWorldCupResultSyncTrigger` para sincronizar cada 15 minutos.
 
 ## Columnas de `partidos`
 
@@ -73,3 +74,23 @@ Si un partido no cruza, revisa:
 * Agrega manualmente `external_match_id` en la fila conflictiva.
 
 El script incluye `TEAM_ALIASES` para normalizar nombres comunes. Puedes ampliar ese objeto sin tocar la app.
+
+## Tabla de goleo
+
+`syncWorldCupScorers` consulta:
+
+```text
+/v4/competitions/WC/scorers?season=2026&limit=20
+```
+
+Luego crea o actualiza la pestaña `goleadores` con:
+
+* `posicion`
+* `jugador`
+* `equipo`
+* `goles`
+* `asistencias`
+* `penales`
+* `actualizado`
+
+La app lee esa pestaña por nombre usando CSV publicado, por eso no hace falta conocer el `gid`.

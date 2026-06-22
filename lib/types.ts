@@ -25,6 +25,28 @@ export interface Prediction {
   goles_visitante: string;
 }
 
+export interface SpecialPrediction {
+  participante_id: string;
+  participante?: string;
+  campeon?: string;
+  subcampeon?: string;
+  tercer_lugar?: string;
+  fase_mexico?: string;
+  mvp?: string;
+  goleador?: string;
+  [key: string]: string | undefined;
+}
+
+export interface Scorer {
+  posicion?: string;
+  jugador: string;
+  equipo: string;
+  goles: string;
+  asistencias?: string;
+  penales?: string;
+  actualizado?: string;
+}
+
 export interface RankingEntry {
   participanteId: number;
   nombre: string;

@@ -2,7 +2,10 @@
 
 import { ReactNode, useState } from "react";
 import {
+  ChartNoAxesCombined,
   CalendarDays,
+  Sparkles,
+  ListOrdered,
   Table2,
   Trophy,
 } from "lucide-react";
@@ -18,9 +21,12 @@ interface Props {
 }
 
 const icons = {
+  puntos: ChartNoAxesCombined,
   hoy: CalendarDays,
   ranking: Trophy,
+  posiciones: ListOrdered,
   partidos: Table2,
+  especiales: Sparkles,
 };
 
 export default function DashboardTabs({

@@ -13,7 +13,7 @@ const RESULT_SYNC_CONFIG = {
   DATE_FROM: "2026-06-11",
   DATE_TO: "2026-07-20",
   MATCH_DATE_TIME_ZONE: "America/Mexico_City",
-  SYNC_IN_PLAY_SCORES: false,
+  SYNC_IN_PLAY_SCORES: true,
   FINAL_STATUSES: ["FINISHED", "AWARDED"],
   LIVE_STATUSES: [
     "IN_PLAY",
@@ -57,6 +57,10 @@ function onOpen() {
     .addItem(
       "Completar external_match_id",
       "populateWorldCupExternalMatchIds"
+    )
+    .addItem(
+      "Sincronizar tabla de goleo",
+      "syncWorldCupScorers"
     )
     .addSeparator()
     .addItem(
@@ -159,6 +163,51 @@ function installWorldCupResultSyncTrigger() {
     .timeBased()
     .everyMinutes(15)
     .create();
+}
+
+function syncWorldCupScorers() {
+  const spreadsheet =
+    SpreadsheetApp.getActiveSpreadsheet();
+  const sheet =
+    spreadsheet.getSheetByName("goleadores") ||
+    spreadsheet.insertSheet("goleadores");
+  const scorers = fetchWorldCupScorers_();
+  const now = new Date();
+  const rows = [
+    [
+      "posicion",
+      "jugador",
+      "equipo",
+      "goles",
+      "asistencias",
+      "penales",
+      "actualizado",
+    ],
+  ];
+
+  scorers.forEach((scorer, index) => {
+    rows.push([
+      index + 1,
+      scorer.player?.name || "",
+      scorer.team?.name || "",
+      scorer.goals ?? 0,
+      scorer.assists ?? "",
+      scorer.penalties ?? "",
+      now,
+    ]);
+  });
+
+  sheet.clearContents();
+  sheet
+    .getRange(1, 1, rows.length, rows[0].length)
+    .setValues(rows);
+  sheet.setFrozenRows(1);
+
+  Logger.log(
+    `Scorers sync completed. Rows: ${scorers.length}`
+  );
+
+  return scorers;
 }
 
 function syncWorldCupResults_(options) {
@@ -336,6 +385,47 @@ function fetchWorldCupMatches_() {
 
   const payload = JSON.parse(body);
   return payload.matches || [];
+}
+
+function fetchWorldCupScorers_() {
+  const token =
+    PropertiesService.getScriptProperties().getProperty(
+      RESULT_SYNC_CONFIG.API_TOKEN_PROPERTY
+    );
+
+  if (!token) {
+    throw new Error(
+      `Missing Script property: ${RESULT_SYNC_CONFIG.API_TOKEN_PROPERTY}`
+    );
+  }
+
+  const url =
+    "https://api.football-data.org/v4/competitions/" +
+    encodeURIComponent(
+      RESULT_SYNC_CONFIG.COMPETITION_CODE
+    ) +
+    "/scorers?season=" +
+    encodeURIComponent(RESULT_SYNC_CONFIG.SEASON) +
+    "&limit=20";
+
+  const response = UrlFetchApp.fetch(url, {
+    method: "get",
+    headers: {
+      "X-Auth-Token": token,
+    },
+    muteHttpExceptions: true,
+  });
+  const status = response.getResponseCode();
+  const body = response.getContentText();
+
+  if (status < 200 || status >= 300) {
+    throw new Error(
+      `football-data.org scorers request failed (${status}): ${body}`
+    );
+  }
+
+  const payload = JSON.parse(body);
+  return payload.scorers || [];
 }
 
 function buildColumnMap_(headers) {

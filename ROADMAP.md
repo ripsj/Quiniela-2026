@@ -17,6 +17,7 @@
 * Pestaña con todos los partidos y predicciones por participante
 * Script de Google Sheets para autocompletar resultados desde football-data.org
 * Partidos del día con predicciones agrupadas por marcador
+* Predicciones especiales visuales por categoría
 
 ## Estadísticas actuales
 
@@ -37,10 +38,6 @@ Mayor cantidad de resultados acertados durante la jornada más reciente.
 Participante que más posiciones ha ganado desde el inicio.
 
 ## Próximas funcionalidades
-
-### Prioridad media
-
-Predicciones especiales visuales por categoría y con listado de cada jugador, marcando quien sigue con posibilidad y quien ya no puede acertar esa predicción. 
 
 ### Prioridad media
 

@@ -13,4 +13,7 @@ export const SHEETS = {
 
   especiales:
     `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=1542800569`,
+
+  goleadores:
+    `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=goleadores`,
 };
