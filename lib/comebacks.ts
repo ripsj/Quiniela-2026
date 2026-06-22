@@ -9,8 +9,17 @@ export function buildComebacks(
     return null;
   }
 
+  const lookbackMatches = 10;
+
   const first =
-    history[0];
+    history[
+      Math.max(
+        history.length -
+          lookbackMatches -
+          1,
+        0
+      )
+    ];
 
   const last =
     history[
@@ -48,8 +57,18 @@ export function buildComebacks(
       }
     );
 
-  return comebacks.sort(
+  const sortedComebacks =
+    comebacks.sort(
     (a, b) =>
       b.mejora - a.mejora
-  )[0];
+    );
+
+  return {
+    ...sortedComebacks[0],
+    top5:
+      sortedComebacks.slice(
+        0,
+        5
+      ),
+  };
 }

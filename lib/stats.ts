@@ -4,6 +4,31 @@ import {
   Prediction,
   Participant,
 } from "./types";
+import {
+  getSheetDateKey,
+  getYesterdayDateKey,
+} from "./matchDay";
+
+export interface ExactosStat {
+  participanteId: number;
+  nombre: string;
+  puntos: number;
+  exactos: number;
+  resultados: number;
+}
+
+export interface DeltaStat {
+  nombre: string;
+  totalDelta: number;
+  partidos: number;
+}
+
+export interface JugadorDiaStat {
+  nombre: string;
+  resultados: number;
+  exactos: number;
+  puntos: number;
+}
 
 export function buildStats(
   ranking: RankingEntry[],
@@ -13,11 +38,25 @@ export function buildStats(
   participants: Participant[]
 ) {
 
+  const exactosRanking =
+    [...ranking].sort((a, b) => {
+      if (b.exactos !== a.exactos) {
+        return b.exactos - a.exactos;
+      }
+
+      if (
+        b.resultados !== a.resultados
+      ) {
+        return (
+          b.resultados - a.resultados
+        );
+      }
+
+      return b.puntos - a.puntos;
+    });
+
   const masExactos =
-    [...ranking].sort(
-      (a, b) =>
-        b.exactos - a.exactos
-    )[0];
+    exactosRanking[0];
 
   const completedMatches =
     matches.filter(
@@ -92,20 +131,30 @@ export function buildStats(
     }
   );
 
-  const mejorDelta =
+  const deltaRanking =
     [...deltaMap.values()]
       .sort(
         (a, b) =>
             a.totalDelta -
             b.totalDelta
-        )[0];
+        );
 
-  const ultimoDia =
-    completedMatches
-      .map((m: any) => m.dia)
-      .filter(Boolean)
-      .sort()
-      .pop();
+  const mejorDelta =
+    deltaRanking[0];
+
+  const yesterdayDateKey =
+    getYesterdayDateKey();
+
+  const yesterdayMatches =
+    completedMatches.filter((match) => {
+      const matchDate =
+        match.fecha || match.dia;
+
+      return (
+        getSheetDateKey(matchDate) ===
+        yesterdayDateKey
+      );
+    });
 
   const jugadorDiaMap = new Map<
     string,
@@ -129,126 +178,148 @@ export function buildStats(
     );
   });
 
-  completedMatches
-    .filter(
-      (m: any) =>
-        m.dia === ultimoDia
-    )
-    .forEach(
-      (match) => {
+  yesterdayMatches.forEach(
+    (match) => {
 
-        predictions
-          .filter(
-            (p) =>
+      predictions
+        .filter(
+          (p) =>
+            Number(
+              p.partido_id
+            ) === Number(match.id)
+        )
+        .forEach(
+          (prediction) => {
+
+            const realHome =
               Number(
-                p.partido_id
-              ) === Number(match.id)
-          )
-          .forEach(
-            (prediction) => {
+                match.goles_local
+              );
 
-              const realHome =
-                Number(
-                  match.goles_local
-                );
+            const realAway =
+              Number(
+                match.goles_visitante
+              );
 
-              const realAway =
-                Number(
-                  match.goles_visitante
-                );
+            const predHome =
+              Number(
+                prediction.goles_local
+              );
 
-              const predHome =
-                Number(
-                  prediction.goles_local
-                );
+            const predAway =
+              Number(
+                prediction.goles_visitante
+              );
 
-              const predAway =
-                Number(
-                  prediction.goles_visitante
-                );
+            const realResult =
+              realHome >
+              realAway
+                ? "H"
+                : realHome <
+                  realAway
+                ? "A"
+                : "D";
 
-              const realResult =
-                realHome >
-                realAway
-                  ? "H"
-                  : realHome <
-                    realAway
-                  ? "A"
-                  : "D";
-
-              const predResult =
-                predHome >
-                predAway
-                  ? "H"
-                  : predHome <
-                    predAway
-                  ? "A"
-                  : "D";
-
-              const player =
-                jugadorDiaMap.get(
-                  prediction.participante_id
-                );
-
-              if (!player) return;
-
-              if (
-                realResult ===
-                predResult
-              ) {
-                player.resultados++;
-                player.puntos++;
-              }
-
-              if (
-                realHome ===
-                  predHome &&
-                realAway ===
+            const predResult =
+              predHome >
+              predAway
+                ? "H"
+                : predHome <
                   predAway
-              ) {
-                player.exactos++;
-                player.puntos++;
-              }
+                ? "A"
+                : "D";
+
+            const player =
+              jugadorDiaMap.get(
+                prediction.participante_id
+              );
+
+            if (!player) return;
+
+            if (
+              realResult ===
+              predResult
+            ) {
+              player.resultados++;
+              player.puntos++;
             }
-          );
-      }
-    );
 
-  const jugadorDelDia =
+            if (
+              realHome ===
+                predHome &&
+              realAway ===
+                predAway
+            ) {
+              player.exactos++;
+              player.puntos++;
+            }
+          }
+        );
+    }
+  );
+
+  const jugadorDiaRanking =
     [...jugadorDiaMap.values()]
-      .sort(
-        (a, b) => {
+      .sort((a, b) => {
 
-          if (
-            b.resultados !==
-            a.resultados
-          ) {
-            return (
-              b.resultados -
-              a.resultados
-            );
-          }
-
-          if (
-            b.exactos !==
-            a.exactos
-          ) {
-            return (
-              b.exactos -
-              a.exactos
-            );
-          }
-
+        if (
+          b.resultados !==
+          a.resultados
+        ) {
           return (
-            b.puntos -
-            a.puntos
+            b.resultados -
+            a.resultados
           );
         }
-      )[0];
+
+        if (
+          b.exactos !==
+          a.exactos
+        ) {
+          return (
+            b.exactos -
+            a.exactos
+          );
+        }
+
+        return (
+          b.puntos -
+          a.puntos
+        );
+      });
+
+  const jugadorDelDia =
+    yesterdayMatches.length > 0
+      ? jugadorDiaRanking[0]
+      : null;
 
   return {
-    masExactos,
-    mejorDelta,
-    jugadorDelDia,
+    masExactos: {
+      ...masExactos,
+      top5:
+        exactosRanking.slice(
+          0,
+          5
+        ),
+    },
+    mejorDelta: {
+      ...mejorDelta,
+      top5:
+        deltaRanking.slice(
+          0,
+          5
+        ),
+    },
+    jugadorDelDia:
+      jugadorDelDia == null
+        ? null
+        : {
+            ...jugadorDelDia,
+            top5:
+              jugadorDiaRanking.slice(
+                0,
+                5
+              ),
+          },
   };
 }

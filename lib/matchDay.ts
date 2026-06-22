@@ -33,6 +33,21 @@ export function getTodayDateKey(
   return `${year}-${month}-${day}`;
 }
 
+export function getYesterdayDateKey(
+  date = new Date(),
+  timeZone = MATCH_DAY_TIME_ZONE
+) {
+  const oneDayMs =
+    24 * 60 * 60 * 1000;
+
+  return getTodayDateKey(
+    new Date(
+      date.getTime() - oneDayMs
+    ),
+    timeZone
+  );
+}
+
 export function getSheetDateKey(
   value: string | null | undefined
 ) {
