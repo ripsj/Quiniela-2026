@@ -9,6 +9,7 @@ export interface Match {
   dia: string;
   hora?: string;
   grupo?: string;
+  jornada?: string;
   ronda?: string;
   equipo_local: string;
   equipo_visitante: string;

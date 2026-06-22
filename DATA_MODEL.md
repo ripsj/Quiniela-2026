@@ -22,6 +22,7 @@ Campos:
 * equipo_local
 * equipo_visitante
 * grupo
+* jornada
 * ronda
 * goles_local
 * goles_visitante
@@ -32,6 +33,8 @@ Campos opcionales recomendados para sincronización automática:
 * external_match_id
 * fuente_resultado
 * ultima_actualizacion_resultado
+
+`jornada` es opcional. Si no existe, la app calcula Jornada 1, 2 y 3 usando `grupo` y el orden de partidos de la fase de grupos.
 
 Importante:
 

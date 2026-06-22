@@ -1,7 +1,14 @@
+"use client";
+
 import {
   MatchPredictionCell,
   MatchPredictionsRow,
 } from "@/lib/matchPredictions";
+import {
+  getSheetDateKey,
+  getTodayDateKey,
+} from "@/lib/matchDay";
+import { useState } from "react";
 
 interface Props {
   rows: MatchPredictionsRow[];
@@ -79,9 +86,154 @@ function formatRank(index: number) {
   return index + 1;
 }
 
+function normalizeJornada(
+  value: string | undefined
+) {
+  const text = String(value || "").trim();
+
+  if (!text) {
+    return null;
+  }
+
+  const match =
+    text.match(/(\d+)/);
+  const number = match?.[1];
+
+  if (!number) {
+    return null;
+  }
+
+  return {
+    value: `jornada-${number}`,
+    label: `Jornada ${number}`,
+    order: Number(number),
+  };
+}
+
+function buildJornadaIndex(
+  rows: MatchPredictionsRow[]
+) {
+  const explicit =
+    new Map<
+      string,
+      {
+        value: string;
+        label: string;
+        order: number;
+      }
+    >();
+  const grouped =
+    new Map<string, MatchPredictionsRow[]>();
+
+  rows.forEach((row) => {
+    const jornada =
+      normalizeJornada(
+        row.match.jornada
+      );
+
+    if (jornada) {
+      explicit.set(row.match.id, jornada);
+      return;
+    }
+
+    const groupKey = String(
+      row.match.grupo || ""
+    ).trim();
+
+    if (!groupKey) {
+      return;
+    }
+
+    const groupRows =
+      grouped.get(groupKey) ?? [];
+
+    groupRows.push(row);
+    grouped.set(groupKey, groupRows);
+  });
+
+  grouped.forEach((groupRows) => {
+    groupRows
+      .sort((a, b) => {
+        const dateComparison =
+          String(
+            a.match.fecha ?? ""
+          ).localeCompare(
+            String(
+              b.match.fecha ?? ""
+            )
+          );
+
+        if (dateComparison !== 0) {
+          return dateComparison;
+        }
+
+        return String(
+          a.match.id
+        ).localeCompare(
+          String(b.match.id),
+          undefined,
+          { numeric: true }
+        );
+      })
+      .forEach((row, index) => {
+        const number =
+          Math.floor(index / 2) + 1;
+
+        if (number > 3) {
+          return;
+        }
+
+        explicit.set(row.match.id, {
+          value: `jornada-${number}`,
+          label: `Jornada ${number}`,
+          order: number,
+        });
+      });
+  });
+
+  return explicit;
+}
+
 export default function MatchPredictionsTable({
   rows,
 }: Props) {
+  const [selectedScope, setSelectedScope] =
+    useState("today");
+  const todayDateKey =
+    getTodayDateKey();
+  const jornadaIndex =
+    buildJornadaIndex(rows);
+  const jornadas = [
+    ...new Map(
+      [...jornadaIndex.values()]
+        .sort(
+          (a, b) =>
+            a.order - b.order
+        )
+        .map((jornada) => [
+          jornada.value,
+          jornada,
+        ])
+    ).values(),
+  ];
+  const visibleRows =
+    selectedScope === "today"
+      ? rows.filter((row) => {
+          const matchDate =
+            row.match.fecha ||
+            row.match.dia;
+
+          return (
+            getSheetDateKey(matchDate) ===
+            todayDateKey
+          );
+        })
+      : rows.filter(
+          (row) =>
+            jornadaIndex.get(
+              row.match.id
+            )?.value === selectedScope
+        );
   const participants =
     rows[0]?.predictions ?? [];
 
@@ -92,10 +244,115 @@ export default function MatchPredictionsTable({
           Todos los partidos y predicciones
         </h2>
         <p className="mt-1 text-sm text-slate-500">
-          Jugadores ordenados por ranking. En partidos finalizados, el color muestra puntos obtenidos.
+          Por defecto se muestran los partidos de hoy. Cambia entre jornadas de fase de grupos para revisar otros partidos.
         </p>
       </div>
 
+      <div
+        className="
+          mb-4
+          flex
+          flex-col
+          gap-3
+          rounded-2xl
+          border
+          border-slate-200
+          bg-white/95
+          p-3
+          shadow-lg
+          backdrop-blur-sm
+          sm:flex-row
+          sm:items-center
+          sm:justify-between
+        "
+      >
+        <div
+          className="
+            inline-flex
+            rounded-lg
+            bg-slate-100
+            p-1
+          "
+        >
+          <button
+            type="button"
+            onClick={() =>
+              setSelectedScope("today")
+            }
+            className={`
+              min-h-10
+              rounded-md
+              px-4
+              py-2
+              text-sm
+              font-semibold
+              transition
+              ${
+                selectedScope === "today"
+                  ? "bg-[#001F5B] text-white shadow"
+                  : "text-slate-600 hover:bg-white hover:text-slate-900"
+              }
+            `}
+          >
+            Hoy
+          </button>
+        </div>
+
+        <label className="flex flex-col gap-1 text-sm font-semibold text-slate-600 sm:min-w-64">
+          Jornada
+          <select
+            value={
+              selectedScope === "today"
+                ? ""
+                : selectedScope
+            }
+            onChange={(event) =>
+              setSelectedScope(
+                event.target.value ||
+                  "today"
+              )
+            }
+            className="
+              rounded-xl
+              border
+              border-slate-300
+              bg-white
+              p-3
+              text-slate-900
+            "
+          >
+            <option value="">
+              Selecciona jornada
+            </option>
+            {jornadas.map((jornada) => (
+              <option
+                key={jornada.value}
+                value={jornada.value}
+              >
+                {jornada.label}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
+
+      {visibleRows.length === 0 ? (
+        <div
+          className="
+            rounded-2xl
+            border
+            border-slate-200
+            bg-white/95
+            p-5
+            text-sm
+            text-slate-500
+            shadow-lg
+            backdrop-blur-sm
+          "
+        >
+          No hay partidos para esta selección.
+        </div>
+      ) : (
       <div
         className="
           overflow-x-auto
@@ -124,7 +381,7 @@ export default function MatchPredictionsTable({
               <th className="sticky left-12 top-0 z-50 w-32 min-w-32 max-w-32 bg-[#001F5B] px-3 py-4 text-left sm:left-16 sm:w-48 sm:min-w-48 sm:max-w-48 sm:p-4 md:w-56 md:min-w-56 md:max-w-56">
                 Jugador
               </th>
-              {rows.map((row) => {
+              {visibleRows.map((row) => {
                 const isFinished =
                   row.match.finalizado === "TRUE";
                 const finalScore =
@@ -232,7 +489,7 @@ export default function MatchPredictionsTable({
                     </div>
                   </td>
 
-                  {rows.map((row) => {
+                  {visibleRows.map((row) => {
                     const prediction =
                       row.predictions.find(
                         (item) =>
@@ -281,6 +538,7 @@ export default function MatchPredictionsTable({
           </tbody>
         </table>
       </div>
+      )}
     </div>
   );
 }
