@@ -27,6 +27,12 @@ Campos:
 * goles_visitante
 * finalizado
 
+Campos opcionales recomendados para sincronización automática:
+
+* external_match_id
+* fuente_resultado
+* ultima_actualizacion_resultado
+
 Importante:
 
 Solo los partidos con:
@@ -81,3 +87,5 @@ Google Sheets es la única fuente de verdad.
 Nunca persistir datos localmente.
 
 Nunca duplicar información.
+
+La sincronización automática de resultados debe escribir de vuelta en Google Sheets. La aplicación web sigue leyendo únicamente los CSV publicados desde Sheets.

@@ -15,6 +15,7 @@
 * Responsive básico
 * Deploy automático en Vercel
 * Pestaña con todos los partidos y predicciones por participante
+* Script de Google Sheets para autocompletar resultados desde football-data.org
 
 ## Estadísticas actuales
 
@@ -42,14 +43,7 @@ Agregar los partidos del día con las predicciones de cada jugador para que sea 
 
 ### Prioridad media
 
-Predicciones especiales visuales
-
-Ejemplo:
-
-Campeón
-
-Argentina ███████ 7
-Brasil ████ 4
+Predicciones especiales visuales por categoría y con listado de cada jugador, marcando quien sigue con posibilidad y quien ya no puede acertar esa predicción. 
 
 ### Prioridad media
 
@@ -63,7 +57,7 @@ Basada en:
 
 ### Prioridad baja
 
-Historial de cambios de posición
+Cambios de posición visual en la tabla de rankings por cada partido (por ejemplo, +3 posiciones, -1 posicion, etc.)
 
 ### Prioridad baja
 
