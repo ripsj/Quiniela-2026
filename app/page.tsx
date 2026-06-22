@@ -11,7 +11,10 @@ import KpiCard from "@/components/KpiCard";
 import RankingTable from "@/components/RankingTable";
 import Podium from "@/components/Podium";
 import RankingHistoryChart from "@/components/RankingHistoryChart";
-import { buildRankingHistory } from "@/lib/rankingHistory";
+import {
+  buildRankingHistory,
+  buildRankingPositionChanges,
+} from "@/lib/rankingHistory";
 import { buildPointsHistory }
 from "@/lib/pointsHistory";
 import { buildStats } from "@/lib/stats";
@@ -66,6 +69,11 @@ export default async function Home() {
       participants,
       matches,
       predictions
+    );
+
+  const rankingPositionChanges =
+    buildRankingPositionChanges(
+      rankingHistory
     );
 
   const pointsHistory =
@@ -128,6 +136,10 @@ export default async function Home() {
       recentForm.get(
         String(player.participanteId)
       ) ?? [];
+    player.cambioPosicion =
+      rankingPositionChanges.get(
+        player.nombre
+      ) ?? 0;
   });
   return (
     <main className="

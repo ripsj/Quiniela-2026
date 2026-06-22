@@ -1,4 +1,9 @@
 import { RankingEntry } from "@/lib/types";
+import {
+  ArrowDown,
+  ArrowUp,
+  Minus,
+} from "lucide-react";
 
 interface Props {
   ranking: RankingEntry[];
@@ -59,53 +64,115 @@ export default function RankingTable({
 
         <tbody>
           {ranking.map(
-            (player, index) => (
-              <tr
-                key={
-                  player.participanteId
-                }
-                className="
-                  border-t
-                  border-slate-200
-                  hover:bg-slate-50
-                  transition
-                "
-              >
-                <td className="p-4 text-center font-bold">
-                  {index === 0 && "🥇"}
-                  {index === 1 && "🥈"}
-                  {index === 2 && "🥉"}
-                  {index > 2 && index + 1}
-                </td>
+            (player, index) => {
+              const positionChange =
+                player.cambioPosicion ?? 0;
+              const PositionIcon =
+                positionChange > 0
+                  ? ArrowUp
+                  : positionChange < 0
+                  ? ArrowDown
+                  : Minus;
+              const positionLabel =
+                positionChange > 0
+                  ? `Subió ${positionChange}`
+                  : positionChange < 0
+                  ? `Bajó ${Math.abs(
+                      positionChange
+                    )}`
+                  : "Sin cambios";
 
-                <td className="p-4 font-semibold text-slate-900">
-                  {player.nombre}
-                </td>
+              return (
+                <tr
+                  key={
+                    player.participanteId
+                  }
+                  className="
+                    border-t
+                    border-slate-200
+                    hover:bg-slate-50
+                    transition
+                  "
+                >
+                  <td className="p-4">
+                    <div className="flex items-center justify-center gap-2">
+                      <span className="min-w-6 text-center font-bold">
+                        {index === 0 && "🥇"}
+                        {index === 1 && "🥈"}
+                        {index === 2 && "🥉"}
+                        {index > 2 &&
+                          index + 1}
+                      </span>
 
-                <td className="p-4 text-right font-bold text-slate-900">
-                  {player.puntos}
-                </td>
+                      <span
+                        title={positionLabel}
+                        aria-label={positionLabel}
+                        className={`
+                          inline-flex
+                          h-6
+                          min-w-6
+                          items-center
+                          justify-center
+                          gap-0.5
+                          rounded-full
+                          px-1
+                          text-xs
+                          font-bold
+                          ${
+                            positionChange > 0
+                              ? "bg-emerald-50 text-emerald-600"
+                              : positionChange < 0
+                              ? "bg-rose-50 text-rose-600"
+                              : "bg-slate-100 text-slate-400"
+                          }
+                        `}
+                      >
+                        <PositionIcon
+                          className="h-3.5 w-3.5"
+                          aria-hidden="true"
+                          strokeWidth={3}
+                        />
+                        {positionChange !==
+                          0 && (
+                          <span>
+                            {Math.abs(
+                              positionChange
+                            )}
+                          </span>
+                        )}
+                      </span>
+                    </div>
+                  </td>
 
-                <td className="p-4 text-right text-slate-700">
-                  {player.resultados}
-                </td>
+                  <td className="p-4 font-semibold text-slate-900">
+                    {player.nombre}
+                  </td>
 
-                <td className="p-4 text-right text-slate-700">
-                  {player.exactos}
-                </td>
+                  <td className="p-4 text-right font-bold text-slate-900">
+                    {player.puntos}
+                  </td>
 
-                <td className="p-4 text-right text-slate-500">
-                  {player.puntos -
-                    leaderPoints}
-                </td>
-                <td className="
-                p-3
-                text-center
-                whitespace-nowrap">
-                  {player.forma?.join("")}
-                </td>
-              </tr>
-            )
+                  <td className="p-4 text-right text-slate-700">
+                    {player.resultados}
+                  </td>
+
+                  <td className="p-4 text-right text-slate-700">
+                    {player.exactos}
+                  </td>
+
+                  <td className="p-4 text-right text-slate-500">
+                    {player.puntos -
+                      leaderPoints}
+                  </td>
+                  <td className="
+                  p-3
+                  text-center
+                  whitespace-nowrap">
+                    {player.forma?.join("")}
+                  </td>
+                </tr>
+              );
+            }
           )}
         </tbody>
       </table>

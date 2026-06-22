@@ -118,3 +118,41 @@ export function buildRankingHistory(
 
   return history;
 }
+
+export function buildRankingPositionChanges(
+  history: Record<
+    string,
+    string | number
+  >[]
+) {
+  const changes =
+    new Map<string, number>();
+
+  if (history.length < 2) {
+    return changes;
+  }
+
+  const previous =
+    history[
+      history.length - 2
+    ];
+  const current =
+    history[
+      history.length - 1
+    ];
+
+  Object.keys(current)
+    .filter(
+      (key) =>
+        key !== "partido"
+    )
+    .forEach((player) => {
+      changes.set(
+        player,
+        Number(previous[player]) -
+          Number(current[player])
+      );
+    });
+
+  return changes;
+}

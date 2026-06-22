@@ -31,5 +31,6 @@ export interface RankingEntry {
   puntos: number;
   exactos: number;
   resultados: number;
+  cambioPosicion?: number;
   forma?: string[];
 }
