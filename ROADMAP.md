@@ -16,6 +16,7 @@
 * Deploy automático en Vercel
 * Pestaña con todos los partidos y predicciones por participante
 * Script de Google Sheets para autocompletar resultados desde football-data.org
+* Partidos del día con predicciones agrupadas por marcador
 
 ## Estadísticas actuales
 
@@ -36,10 +37,6 @@ Mayor cantidad de resultados acertados durante la jornada más reciente.
 Participante que más posiciones ha ganado desde el inicio.
 
 ## Próximas funcionalidades
-
-### Prioridad alta
-
-Agregar los partidos del día con las predicciones de cada jugador para que sea fácil ver que resultado espera cada quien durante los partidos del día.
 
 ### Prioridad media
 

@@ -26,6 +26,12 @@ import PointsHistoryChart
 from "@/components/PointsHistoryChart";
 import DashboardTabs from "@/components/DashboardTabs";
 import MatchPredictionsTable from "@/components/MatchPredictionsTable";
+import TodaysMatchesSection from "@/components/TodaysMatchesSection";
+import {
+  filterMatchPredictionsByDate,
+  formatDateKeyForDisplay,
+  getTodayDateKey,
+} from "@/lib/matchDay";
 import { Analytics } from "@vercel/analytics/next"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 
@@ -108,6 +114,15 @@ export default async function Home() {
     predictions
   );
 
+  const todayDateKey =
+  getTodayDateKey();
+
+  const todaysMatchPredictions =
+  filterMatchPredictionsByDate(
+    matchPredictions,
+    todayDateKey
+  );
+
   ranking.forEach((player) => {
     player.forma =
       recentForm.get(
@@ -184,6 +199,22 @@ export default async function Home() {
 
                 <RankingTable ranking={ranking} />
               </>
+            ),
+          },
+          {
+            id: "hoy",
+            label: "Hoy",
+            content: (
+              <TodaysMatchesSection
+                rows={
+                  todaysMatchPredictions
+                }
+                dateLabel={
+                  formatDateKeyForDisplay(
+                    todayDateKey
+                  )
+                }
+              />
             ),
           },
           {

@@ -1,7 +1,11 @@
 "use client";
 
 import { ReactNode, useState } from "react";
-import { Table2, Trophy } from "lucide-react";
+import {
+  CalendarDays,
+  Table2,
+  Trophy,
+} from "lucide-react";
 
 interface Tab {
   id: string;
@@ -14,6 +18,7 @@ interface Props {
 }
 
 const icons = {
+  hoy: CalendarDays,
   ranking: Trophy,
   partidos: Table2,
 };
