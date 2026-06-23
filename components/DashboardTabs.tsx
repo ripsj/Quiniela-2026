@@ -40,13 +40,17 @@ export default function DashboardTabs({
       ?.content ?? tabs[0]?.content;
 
   return (
-    <section className="mt-8">
+    <section className="mt-8 min-w-0 max-w-full">
       <div
         role="tablist"
         aria-label="Secciones de la quiniela"
         className="
           mb-6
-          inline-flex
+          flex
+          w-full
+          max-w-full
+          gap-1
+          overflow-x-auto
           rounded-lg
           border
           border-white/30
@@ -76,6 +80,7 @@ export default function DashboardTabs({
               className={`
                 inline-flex
                 min-h-11
+                shrink-0
                 items-center
                 gap-2
                 rounded-md
@@ -101,7 +106,9 @@ export default function DashboardTabs({
         })}
       </div>
 
-      <div>{activeContent}</div>
+      <div className="min-w-0 max-w-full">
+        {activeContent}
+      </div>
     </section>
   );
 }

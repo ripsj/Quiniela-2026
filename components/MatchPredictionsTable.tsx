@@ -375,10 +375,10 @@ export default function MatchPredictionsTable({
                 text-white
               "
             >
-              <th className="sticky left-0 top-0 z-50 w-12 min-w-12 max-w-12 bg-[#001F5B] px-2 py-4 text-center sm:w-16 sm:min-w-16 sm:max-w-16 sm:p-4">
+              <th className="sticky left-0 top-0 z-50 w-12 min-w-12 max-w-12 bg-[#001F5B] px-2 py-4 text-center after:absolute after:inset-y-0 after:right-[-2px] after:w-1 after:bg-[#001F5B] sm:w-16 sm:min-w-16 sm:max-w-16 sm:p-4">
                 #
               </th>
-              <th className="sticky left-12 top-0 z-50 w-32 min-w-32 max-w-32 bg-[#001F5B] px-3 py-4 text-left sm:left-16 sm:w-48 sm:min-w-48 sm:max-w-48 sm:p-4 md:w-56 md:min-w-56 md:max-w-56">
+              <th className="sticky left-12 top-0 z-50 w-32 min-w-32 max-w-32 bg-[#001F5B] px-3 py-4 text-left after:absolute after:inset-y-0 after:right-[-4px] after:w-2 after:bg-[#001F5B] sm:left-16 sm:w-48 sm:min-w-48 sm:max-w-48 sm:p-4 md:w-56 md:min-w-56 md:max-w-56">
                 Jugador
               </th>
               {visibleRows.map((row) => {
@@ -446,6 +446,11 @@ export default function MatchPredictionsTable({
                       bg-white
                       px-2
                       py-4
+                      after:absolute
+                      after:inset-y-0
+                      after:right-[-2px]
+                      after:w-1
+                      after:bg-white
                       text-center
                       font-bold
                       transition
@@ -470,6 +475,11 @@ export default function MatchPredictionsTable({
                       bg-white
                       px-3
                       py-4
+                      after:absolute
+                      after:inset-y-0
+                      after:right-[-4px]
+                      after:w-2
+                      after:bg-white
                       font-semibold
                       text-slate-900
                       transition

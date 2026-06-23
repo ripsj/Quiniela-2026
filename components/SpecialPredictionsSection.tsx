@@ -106,6 +106,8 @@ function SpecialCategoryCard({
   return (
     <article
       className="
+        min-w-0
+        max-w-full
         overflow-hidden
         rounded-2xl
         border
@@ -117,7 +119,7 @@ function SpecialCategoryCard({
     >
       <div className="bg-gradient-to-r from-[#001F5B] to-[#8B1538] p-5 text-white">
         <div className="flex items-start justify-between gap-4">
-          <div>
+          <div className="min-w-0">
             <h3 className="text-xl font-extrabold">
               {item.category.label}
             </h3>
@@ -131,7 +133,7 @@ function SpecialCategoryCard({
             )}
           </div>
 
-          <span className="rounded-full bg-white/15 px-3 py-1 text-xs font-bold">
+          <span className="shrink-0 rounded-full bg-white/15 px-3 py-1 text-xs font-bold">
             {item.groups.length} opciones
           </span>
         </div>
@@ -261,7 +263,7 @@ export default function SpecialPredictionsSection({
     "goleador";
 
   return (
-    <section className="mt-8">
+    <section className="mt-8 min-w-0 max-w-full">
       <div className="mb-4">
         <h2 className="text-2xl font-bold text-slate-900">
           Predicciones especiales
@@ -278,6 +280,7 @@ export default function SpecialPredictionsSection({
           mb-4
           flex
           gap-2
+          max-w-full
           overflow-x-auto
           rounded-lg
           border
@@ -331,13 +334,15 @@ export default function SpecialPredictionsSection({
       <div
         className={
           showScorers
-            ? "grid gap-4 xl:grid-cols-2"
+            ? "grid min-w-0 max-w-full gap-4 xl:grid-cols-2"
             : ""
         }
       >
         {showScorers && (
           <div
             className="
+              min-w-0
+              max-w-full
               overflow-hidden
               rounded-2xl
               border
@@ -368,23 +373,23 @@ export default function SpecialPredictionsSection({
                 Aún no hay goleadores sincronizados.
               </div>
             ) : (
-              <div className="overflow-x-auto text-slate-900">
-                <table className="min-w-[620px] w-full">
+              <div className="max-w-full overflow-x-auto text-slate-900">
+                <table className="w-full min-w-[360px] sm:min-w-[620px]">
                   <thead>
                     <tr className="border-b border-slate-200 text-xs uppercase text-slate-500">
-                      <th className="p-3 text-center">
+                      <th className="p-2 text-center sm:p-3">
                         #
                       </th>
-                      <th className="p-3 text-left">
+                      <th className="p-2 text-left sm:p-3">
                         Jugador
                       </th>
-                      <th className="p-3 text-left">
+                      <th className="hidden p-2 text-left sm:table-cell sm:p-3">
                         Equipo
                       </th>
-                      <th className="p-3 text-right">
+                      <th className="p-2 text-right sm:p-3">
                         Goles
                       </th>
-                      <th className="p-3 text-right">
+                      <th className="hidden p-2 text-right sm:table-cell sm:p-3">
                         Asist.
                       </th>
                     </tr>
@@ -396,20 +401,25 @@ export default function SpecialPredictionsSection({
                           key={`${scorer.jugador}-${scorer.equipo}`}
                           className="border-b border-slate-100 last:border-0"
                         >
-                          <td className="p-3 text-center font-bold text-slate-500">
+                          <td className="p-2 text-center font-bold text-slate-500 sm:p-3">
                             {scorer.posicion ||
                               index + 1}
                           </td>
-                          <td className="p-3 font-bold text-slate-900">
-                            {scorer.jugador}
+                          <td className="p-2 font-bold text-slate-900 sm:p-3">
+                            <div className="max-w-40 truncate sm:max-w-none">
+                              {scorer.jugador}
+                            </div>
+                            <div className="mt-1 text-xs font-medium text-slate-500 sm:hidden">
+                              {scorer.equipo}
+                            </div>
                           </td>
-                          <td className="p-3 text-slate-600">
+                          <td className="hidden p-2 text-slate-600 sm:table-cell sm:p-3">
                             {scorer.equipo}
                           </td>
-                          <td className="p-3 text-right text-lg font-extrabold text-[#8B1538]">
+                          <td className="p-2 text-right text-lg font-extrabold text-[#8B1538] sm:p-3">
                             {scorer.goles}
                           </td>
-                          <td className="p-3 text-right text-slate-600">
+                          <td className="hidden p-2 text-right text-slate-600 sm:table-cell sm:p-3">
                             {scorer.asistencias ||
                               "-"}
                           </td>

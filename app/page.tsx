@@ -169,6 +169,7 @@ export default async function Home() {
     relative
     mx-auto
     max-w-7xl
+    overflow-x-hidden
     p-4
     md:p-8
     ">
