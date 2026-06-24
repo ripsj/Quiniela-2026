@@ -1,10 +1,15 @@
 import Papa from "papaparse";
 
+const SHEETS_REVALIDATE_SECONDS = 60;
+
 export async function loadCsv<T>(
   url: string
 ): Promise<T[]> {
   const response = await fetch(url, {
-    cache: "no-store",
+    next: {
+      revalidate: SHEETS_REVALIDATE_SECONDS,
+      tags: ["google-sheets"],
+    },
   });
 
   const csv = await response.text();
@@ -22,7 +27,10 @@ export async function loadOptionalCsv<T>(
 ): Promise<T[]> {
   try {
     const response = await fetch(url, {
-      cache: "no-store",
+      next: {
+        revalidate: SHEETS_REVALIDATE_SECONDS,
+        tags: ["google-sheets"],
+      },
     });
 
     if (!response.ok) {

@@ -45,34 +45,35 @@ import { buildSpecialPredictions } from "@/lib/specialPredictions";
 import { Analytics } from "@vercel/analytics/next"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 
+export const revalidate = 60;
+
 export default async function Home() {
 
   
 
-  const participants =
-    await loadCsv<Participant>(
+  const [
+    participants,
+    matches,
+    predictions,
+    specialPredictionsRows,
+    scorers,
+  ] = await Promise.all([
+    loadCsv<Participant>(
       SHEETS.participantes
-    );
-
-  const matches =
-    await loadCsv<Match>(
+    ),
+    loadCsv<Match>(
       SHEETS.partidos
-    );
-
-  const predictions =
-    await loadCsv<Prediction>(
+    ),
+    loadCsv<Prediction>(
       SHEETS.pronosticos
-    );
-
-  const specialPredictionsRows =
-    await loadCsv<SpecialPrediction>(
+    ),
+    loadCsv<SpecialPrediction>(
       SHEETS.especiales
-    );
-
-  const scorers =
-    await loadOptionalCsv<Scorer>(
+    ),
+    loadOptionalCsv<Scorer>(
       SHEETS.goleadores
-    );
+    ),
+  ]);
 
   const ranking =
     buildRanking(
