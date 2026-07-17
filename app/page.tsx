@@ -39,8 +39,7 @@ import {
 import { Analytics } from "@vercel/analytics/next"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import Image from "next/image";
-import patoMerlin from "@/pato_merlin.jpg";
-import fifaLogo from "@/fifa_logo.jpg";
+import tournamentBanner from "@/public/quiniela-banner.png";
 
 export const revalidate = 60;
 
@@ -157,37 +156,23 @@ export default async function Home() {
     p-4
     md:p-8
     ">
-      <div className="mb-10 flex flex-col items-center justify-center gap-5 text-center lg:flex-row lg:text-left">
-        <div className="relative h-28 w-28 shrink-0 overflow-hidden rounded-3xl border-4 border-white bg-white shadow-xl ring-1 ring-slate-200 md:h-36 md:w-36">
-          <Image
-            src={patoMerlin}
-            alt="Pato Merlín, mascota de la Quiniela Mundial 2026"
-            fill
-            preload
-            sizes="(max-width: 768px) 112px, 144px"
-            className="object-cover object-[center_38%]"
-          />
-        </div>
-
-        <div>
-          <h1 className="text-4xl font-extrabold text-slate-900 md:text-6xl">
+      <div className="relative mb-10 h-[280px] overflow-hidden rounded-3xl bg-[#07175d] shadow-2xl ring-1 ring-white/40 sm:aspect-[3/1] sm:h-auto">
+        <Image
+          src={tournamentBanner}
+          alt="Pato Merlín en una celebración gráfica del Mundial 2026"
+          fill
+          preload
+          sizes="(max-width: 640px) 100vw, 1280px"
+          className="object-cover object-[66%_center] sm:object-center"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#07175d]/95 via-[#07175d]/55 to-transparent sm:via-[#07175d]/20" />
+        <div className="absolute inset-0 flex max-w-[68%] flex-col justify-center p-6 text-white sm:max-w-[58%] sm:p-10 lg:p-14">
+          <h1 className="text-3xl font-extrabold leading-tight drop-shadow-lg sm:text-4xl lg:text-6xl">
             🏆 Quiniela Mundial 2026
           </h1>
-
-          <p className="mt-3 text-lg text-slate-500">
+          <p className="mt-3 text-sm font-semibold text-white/85 drop-shadow md:text-lg">
             Ranking en tiempo real
           </p>
-        </div>
-
-        <div className="relative h-24 w-40 shrink-0 overflow-hidden rounded-3xl border-4 border-white bg-white shadow-xl ring-1 ring-violet-200 md:h-28 md:w-48">
-          <Image
-            src={fifaLogo}
-            alt="Emblema visual del Mundial 2026"
-            fill
-            preload
-            sizes="(max-width: 768px) 160px, 192px"
-            className="object-cover"
-          />
         </div>
       </div>
 
