@@ -3,7 +3,6 @@
 import { ReactNode, useState } from "react";
 import {
   ChartNoAxesCombined,
-  CalendarDays,
   Sparkles,
   ListOrdered,
   Table2,
@@ -22,7 +21,6 @@ interface Props {
 
 const icons = {
   puntos: ChartNoAxesCombined,
-  hoy: CalendarDays,
   ranking: Trophy,
   posiciones: ListOrdered,
   partidos: Table2,

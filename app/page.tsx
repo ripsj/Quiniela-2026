@@ -34,13 +34,7 @@ import PointsHistoryChart
 from "@/components/PointsHistoryChart";
 import DashboardTabs from "@/components/DashboardTabs";
 import MatchPredictionsTable from "@/components/MatchPredictionsTable";
-import TodaysMatchesSection from "@/components/TodaysMatchesSection";
 import SpecialPredictionsSection from "@/components/SpecialPredictionsSection";
-import {
-  filterMatchPredictionsByDate,
-  formatDateKeyForDisplay,
-  getTodayDateKey,
-} from "@/lib/matchDay";
 import {
   buildSpecialPredictions,
   getOpenSpecialPoints,
@@ -144,15 +138,6 @@ export default async function Home() {
     predictions
   );
 
-  const todayDateKey =
-  getTodayDateKey();
-
-  const todaysMatchPredictions =
-  filterMatchPredictionsByDate(
-    matchPredictions,
-    todayDateKey
-  );
-
   const specialPredictions =
   buildSpecialPredictions(
     participants,
@@ -241,22 +226,6 @@ export default async function Home() {
 
                 <RankingTable ranking={ranking} />
               </>
-            ),
-          },
-          {
-            id: "hoy",
-            label: "Hoy",
-            content: (
-              <TodaysMatchesSection
-                rows={
-                  todaysMatchPredictions
-                }
-                dateLabel={
-                  formatDateKeyForDisplay(
-                    todayDateKey
-                  )
-                }
-              />
             ),
           },
           {

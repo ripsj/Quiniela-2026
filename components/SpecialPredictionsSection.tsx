@@ -212,7 +212,7 @@ function ParticipantSpecialCard({
             {participant.name}
           </h3>
           <p className="mt-1 text-xs font-semibold text-slate-500">
-            {confirmedPoints} ganados · {possiblePoints} por ganar
+            {confirmedPoints} puntos · {possiblePoints} por ganar
           </p>
         </div>
         {unknownCount > 0 && (
@@ -591,21 +591,6 @@ export default function SpecialPredictionsSection({
   );
   const pointsInPlay =
     getOpenSpecialPoints(categories);
-  const unknownPredictions = new Set(
-    categories.flatMap((category) =>
-      category.groups.flatMap((group) =>
-        group.players
-          .filter(
-            (player) =>
-              player.status === "unknown"
-          )
-          .map(
-            (player) =>
-              `${category.category.key}:${player.participanteId}`
-          )
-      )
-    )
-  ).size;
   const showScorers =
     activeCategory?.category.key ===
     "goleador";
@@ -638,7 +623,7 @@ export default function SpecialPredictionsSection({
         </button>
       </div>
 
-      <div className="mb-4 grid gap-3 sm:grid-cols-3">
+      <div className="mb-4 grid gap-3 sm:grid-cols-2">
         <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4">
           <div className="text-2xl font-extrabold text-emerald-800">
             {aliveParticipantIds.size}
@@ -653,32 +638,6 @@ export default function SpecialPredictionsSection({
           </div>
           <div className="text-sm font-semibold text-sky-700">
             puntos en categorías abiertas
-          </div>
-        </div>
-        <div
-          className={`rounded-xl border p-4 ${
-            unknownPredictions > 0
-              ? "border-amber-200 bg-amber-50"
-              : "border-slate-200 bg-white"
-          }`}
-        >
-          <div
-            className={`text-2xl font-extrabold ${
-              unknownPredictions > 0
-                ? "text-amber-800"
-                : "text-slate-800"
-            }`}
-          >
-            {unknownPredictions}
-          </div>
-          <div
-            className={`text-sm font-semibold ${
-              unknownPredictions > 0
-                ? "text-amber-700"
-                : "text-slate-600"
-            }`}
-          >
-            predicciones por revisar
           </div>
         </div>
       </div>
