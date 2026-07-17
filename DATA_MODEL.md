@@ -92,6 +92,25 @@ Valores soportados:
 * acertado
 * pendiente
 
+Para categorías con pocas opciones todavía posibles, se puede mantener una sola lista en vez de marcar cada fila. Headers soportados:
+
+* campeon_opciones_vivas
+* subcampeon_opciones_vivas
+* tercer_lugar_opciones_vivas
+* fase_mexico_opciones_vivas
+* mvp_opciones_vivas
+* goleador_opciones_vivas
+
+Las opciones se separan con `|`, `;` o `,`. Ejemplo durante la final:
+
+`campeon_opciones_vivas = España | Argentina`
+
+También se puede escribir provisionalmente esa lista en el campo de resultado existente:
+
+`campeon_resultado = España | Argentina`
+
+Una lista con varias opciones se interpreta como opciones vivas. Cuando quede un único valor, por ejemplo `campeon_resultado = España`, se interpreta como resultado oficial y concede los puntos correspondientes. Valores como `pendiente`, `por definir`, `por decidir`, `en juego` o `tbd` no se interpretan como resultados oficiales.
+
 Alternativa recomendada:
 
 En vez de marcar el estado participante por participante, puedes agregar una sola columna de resultado por categoría. La app compara cada predicción contra ese resultado y marca automáticamente `acertado` o `fuera`.

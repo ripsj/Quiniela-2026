@@ -26,6 +26,7 @@ export interface SpecialPredictionGroup {
 export interface SpecialPredictionCategory {
   category: SpecialCategory;
   result: string | null;
+  liveOptions: string[];
   groups: SpecialPredictionGroup[];
 }
 
@@ -174,7 +175,8 @@ function getPredictionStatus(
   prediction: SpecialPrediction,
   categoryKey: string,
   predictionValue: string,
-  resultValue: string | null
+  resultValue: string | null,
+  liveOptions: string[]
 ): SpecialPredictionPlayer["status"] {
   if (resultValue) {
     const predictionAlias =
@@ -185,6 +187,17 @@ function getPredictionStatus(
     return predictionAlias.canonical ===
       resultAlias.canonical
       ? "hit"
+      : "eliminated";
+  }
+
+  if (liveOptions.length > 0) {
+    const predictionAlias =
+      resolveSpecialAlias(predictionValue);
+
+    return liveOptions.includes(
+      predictionAlias.canonical
+    )
+      ? "alive"
       : "eliminated";
   }
 
@@ -277,6 +290,22 @@ function getCategoryResult(
         );
 
       if (value) {
+        if (
+          [
+            "pendiente",
+            "por definir",
+            "por decidir",
+            "en juego",
+            "tbd",
+          ].includes(normalizeStatus(value))
+        ) {
+          continue;
+        }
+
+        if (/[|;,\n]/.test(value)) {
+          continue;
+        }
+
         return resolveSpecialAlias(value)
           .canonical;
       }
@@ -284,6 +313,89 @@ function getCategoryResult(
   }
 
   return null;
+}
+
+function getCategoryLiveOptions(
+  predictions: SpecialPrediction[],
+  category: SpecialCategory
+) {
+  const keys = [
+    `${category.key}_opciones_vivas`,
+    `${category.key}_vivos`,
+    `${category.key}_vivas`,
+    ...(category.aliases ?? []).flatMap(
+      (alias) => [
+        `${alias}_opciones_vivas`,
+        `${alias}_vivos`,
+        `${alias}_vivas`,
+      ]
+    ),
+  ];
+
+  for (const prediction of predictions) {
+    for (const key of keys) {
+      const value = normalizeValue(
+        getPredictionField(prediction, key)
+      );
+
+      if (value) {
+        return [
+          ...new Set(
+            value
+              .split(/[|;,\n]+/)
+              .map((option) => option.trim())
+              .filter(Boolean)
+              .map(
+                (option) =>
+                  resolveSpecialAlias(option)
+                    .canonical
+              )
+          ),
+        ];
+      }
+    }
+  }
+
+  const provisionalResultKeys = [
+    `${category.key}_resultado`,
+    `${category.key}_ganador`,
+    `${category.key}_real`,
+    `${category.key}_oficial`,
+    ...(category.aliases ?? []).flatMap(
+      (alias) => [
+        `${alias}_resultado`,
+        `${alias}_ganador`,
+        `${alias}_real`,
+        `${alias}_oficial`,
+      ]
+    ),
+  ];
+
+  for (const prediction of predictions) {
+    for (const key of provisionalResultKeys) {
+      const value = normalizeValue(
+        getPredictionField(prediction, key)
+      );
+      const options = value
+        .split(/[|;,\n]+/)
+        .map((option) => option.trim())
+        .filter(Boolean);
+
+      if (options.length > 1) {
+        return [
+          ...new Set(
+            options.map(
+              (option) =>
+                resolveSpecialAlias(option)
+                  .canonical
+            )
+          ),
+        ];
+      }
+    }
+  }
+
+  return [];
 }
 
 export function buildSpecialPredictions(
@@ -303,6 +415,11 @@ export function buildSpecialPredictions(
   return SPECIAL_CATEGORIES.map((category) => {
     const result =
       getCategoryResult(
+        predictions,
+        category
+      );
+    const liveOptions =
+      getCategoryLiveOptions(
         predictions,
         category
       );
@@ -342,7 +459,8 @@ export function buildSpecialPredictions(
           prediction,
           category.key,
           rawValue,
-          result
+          result,
+          liveOptions
         ),
       });
 
@@ -352,6 +470,7 @@ export function buildSpecialPredictions(
     return {
       category,
       result,
+      liveOptions,
       groups: [...groups.entries()]
         .map(([value, players]) => {
           const variants =

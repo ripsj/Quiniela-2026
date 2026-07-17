@@ -64,31 +64,43 @@ function getGroupTone(
   if (hasHit) {
     return {
       border: "border-amber-300",
+      background: "bg-amber-50",
       bar: "from-amber-400 to-yellow-500",
       glow: "shadow-amber-100",
+      label: "Acertado",
+      labelTone: "bg-amber-100 text-amber-800",
     };
   }
 
   if (hasAlive) {
     return {
       border: "border-emerald-300",
+      background: "bg-emerald-50",
       bar: "from-emerald-400 to-teal-500",
       glow: "shadow-emerald-100",
+      label: "Vivo",
+      labelTone: "bg-emerald-100 text-emerald-800",
     };
   }
 
   if (allEliminated) {
     return {
       border: "border-red-200",
+      background: "bg-red-50/70",
       bar: "from-red-300 to-rose-500",
       glow: "shadow-red-50",
+      label: "Fuera",
+      labelTone: "bg-red-100 text-red-700",
     };
   }
 
   return {
-    border: "border-slate-200",
-    bar: "from-[#001F5B] to-[#8B1538]",
-    glow: "shadow-slate-100",
+    border: "border-amber-300",
+    background: "bg-amber-50/70",
+    bar: "from-amber-300 to-orange-400",
+    glow: "shadow-amber-100",
+    label: "Por revisar",
+    labelTone: "bg-amber-100 text-amber-800",
   };
 }
 
@@ -308,6 +320,12 @@ function SpecialCategoryCard({
         (group) => group.players.length
       )
     );
+  const liveOptionCount = item.groups.filter(
+    (group) =>
+      group.players.some(
+        (player) => player.status === "alive"
+      )
+  ).length;
 
   return (
     <article
@@ -337,10 +355,16 @@ function SpecialCategoryCard({
                 Resultado: {item.result}
               </p>
             )}
+            {!item.result &&
+              item.liveOptions.length > 0 && (
+                <p className="mt-2 inline-flex rounded-full bg-emerald-400/20 px-3 py-1 text-xs font-bold text-emerald-50">
+                  Siguen vivos: {item.liveOptions.join(", ")}
+                </p>
+              )}
           </div>
 
           <span className="shrink-0 rounded-full bg-white/15 px-3 py-1 text-xs font-bold">
-            {visibleGroups.length} opciones
+            {liveOptionCount} opciones vivas
           </span>
         </div>
       </div>
@@ -374,10 +398,10 @@ function SpecialCategoryCard({
                 className={`
                   rounded-xl
                   border
-                  bg-white
                   p-3
                   shadow-md
                   ${tone.border}
+                  ${tone.background}
                   ${tone.glow}
                 `}
               >
@@ -395,9 +419,14 @@ function SpecialCategoryCard({
                       </div>
                     )}
                   </div>
-                  <span className="text-lg font-extrabold text-slate-900">
-                    {group.players.length}
-                  </span>
+                  <div className="flex shrink-0 items-center gap-2">
+                    <span className={`rounded-full px-2 py-1 text-xs font-extrabold ${tone.labelTone}`}>
+                      {tone.label}
+                    </span>
+                    <span className="text-lg font-extrabold text-slate-900">
+                      {group.players.length}
+                    </span>
+                  </div>
                 </div>
 
                 <div className="h-2 overflow-hidden rounded-full bg-slate-100">
@@ -458,7 +487,7 @@ export default function SpecialPredictionsSection({
   const [activeCategoryKey, setActiveCategoryKey] =
     useState(defaultCategory);
   const [showEliminated, setShowEliminated] =
-    useState(false);
+    useState(true);
   const [view, setView] = useState<
     "category" | "participant"
   >("category");
