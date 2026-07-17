@@ -103,7 +103,8 @@ export default async function Home() {
     buildRankingHistory(
       participants,
       matches,
-      predictions
+      predictions,
+      effectiveSpecialPredictionsRows
     );
 
   const rankingPositionChanges =
@@ -115,7 +116,8 @@ export default async function Home() {
   buildPointsHistory(
     participants,
     matches,
-    predictions
+    predictions,
+    effectiveSpecialPredictionsRows
   );
 
   const stats =

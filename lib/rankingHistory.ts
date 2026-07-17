@@ -2,14 +2,17 @@ import {
   Match,
   Participant,
   Prediction,
+  SpecialPrediction,
 } from "./types";
 
 import { calculateMatchPoints } from "./scoring";
+import { buildResolvedSpecialPointEvents } from "./specialPredictions";
 
 export function buildRankingHistory(
   participants: Participant[],
   matches: Match[],
-  predictions: Prediction[]
+  predictions: Prediction[],
+  specialPredictions: SpecialPrediction[] = []
 ) {
 
   const completedMatches = matches
@@ -37,6 +40,40 @@ export function buildRankingHistory(
     string,
     string | number
   >[] = [];
+
+  const appendRanking = (
+    event: string | number
+  ) => {
+    const ranking =
+      [...participants]
+        .map((p) => ({
+          nombre: p.nombre,
+          puntos:
+            scores.get(
+              String(p.id)
+            ) ?? 0,
+        }))
+        .sort(
+          (a, b) =>
+            b.puntos - a.puntos
+        );
+
+    const row: Record<
+      string,
+      string | number
+    > = {
+      partido: event,
+    };
+
+    ranking.forEach(
+      (player, pos) => {
+        row[player.nombre] =
+          pos + 1;
+      }
+    );
+
+    history.push(row);
+  };
 
   completedMatches.forEach(
     (match, index) => {
@@ -84,37 +121,29 @@ export function buildRankingHistory(
           }
         );
 
-      const ranking =
-        [...participants]
-          .map((p) => ({
-            nombre: p.nombre,
-            puntos:
-              scores.get(
-                String(p.id)
-              ) ?? 0,
-          }))
-          .sort(
-            (a, b) =>
-              b.puntos - a.puntos
-          );
-
-      const row: Record<
-        string,
-        string | number
-      > = {
-        partido: index + 1,
-      };
-
-      ranking.forEach(
-        (player, pos) => {
-          row[player.nombre] =
-            pos + 1;
-        }
-      );
-
-      history.push(row);
+      appendRanking(index + 1);
     }
   );
+
+  const specialEvents =
+    buildResolvedSpecialPointEvents(
+      participants,
+      specialPredictions
+    );
+
+  specialEvents.forEach((event) => {
+    event.participantIds.forEach((participantId) => {
+      scores.set(
+        participantId,
+        (scores.get(participantId) ?? 0) +
+          event.points
+      );
+    });
+
+    appendRanking(
+      `Especial: ${event.label}`
+    );
+  });
 
   return history;
 }

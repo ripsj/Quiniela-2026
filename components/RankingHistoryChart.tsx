@@ -72,7 +72,7 @@ export default function RankingHistoryChart({
         mb-6
         text-slate-500
         ">
-        Posición después de cada partido
+        Posición después de cada partido y especial resuelto
         </p>
 
         <div className="mb-6">

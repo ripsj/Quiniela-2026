@@ -36,6 +36,22 @@ export interface SpecialPointSummary {
   unknown: number;
 }
 
+export interface ResolvedSpecialPointEvent {
+  key: string;
+  label: string;
+  points: number;
+  participantIds: string[];
+}
+
+const SPECIAL_HISTORY_ORDER = [
+  "fase_mexico",
+  "tercer_lugar",
+  "goleador",
+  "subcampeon",
+  "campeon",
+  "mvp",
+];
+
 export const SPECIAL_CATEGORIES: SpecialCategory[] = [
   {
     key: "campeon",
@@ -590,6 +606,56 @@ export function buildSpecialPointSummaries(
   });
 
   return summaries;
+}
+
+export function buildResolvedSpecialPointEvents(
+  participants: Participant[],
+  predictions: SpecialPrediction[]
+): ResolvedSpecialPointEvent[] {
+  const categories = buildSpecialPredictions(
+    participants,
+    predictions
+  );
+
+  return SPECIAL_HISTORY_ORDER.flatMap(
+    (categoryKey) => {
+      const category = categories.find(
+        (item) =>
+          item.category.key === categoryKey
+      );
+
+      if (!category) {
+        return [];
+      }
+
+      const participantIds = [
+        ...new Set(
+          category.groups.flatMap((group) =>
+            group.players
+              .filter(
+                (player) =>
+                  player.status === "hit"
+              )
+              .map(
+                (player) =>
+                  player.participanteId
+              )
+          )
+        ),
+      ];
+
+      return participantIds.length > 0
+        ? [
+            {
+              key: category.category.key,
+              label: category.category.label,
+              points: category.category.points,
+              participantIds,
+            },
+          ]
+        : [];
+    }
+  );
 }
 
 export function getOpenSpecialPoints(
