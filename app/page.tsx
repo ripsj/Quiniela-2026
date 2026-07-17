@@ -41,7 +41,10 @@ import {
   formatDateKeyForDisplay,
   getTodayDateKey,
 } from "@/lib/matchDay";
-import { buildSpecialPredictions } from "@/lib/specialPredictions";
+import {
+  buildSpecialPredictions,
+  getOpenSpecialPoints,
+} from "@/lib/specialPredictions";
 import { Analytics } from "@vercel/analytics/next"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 
@@ -79,7 +82,8 @@ export default async function Home() {
     buildRanking(
       participants,
       matches,
-      predictions
+      predictions,
+      specialPredictionsRows
     );
 
   const rankingHistory =
@@ -155,6 +159,11 @@ export default async function Home() {
     specialPredictionsRows
   );
 
+  const specialPointsInPlay =
+    getOpenSpecialPoints(
+      specialPredictions
+    );
+
   ranking.forEach((player) => {
     player.forma =
       recentForm.get(
@@ -211,12 +220,8 @@ export default async function Home() {
         />
 
         <KpiCard
-          title="Puntos Máximos Posibles"
-          value={
-            matches.filter(
-              m => m.finalizado === "TRUE"
-            ).length * 2
-          }
+          title="Puntos especiales abiertos"
+          value={specialPointsInPlay}
         />
 
       </div>

@@ -42,7 +42,23 @@ export default function RankingTable({
             </th>
 
             <th className="p-4 text-right">
-              Pts
+              Total
+            </th>
+
+            <th className="p-4 text-right">
+              Partidos
+            </th>
+
+            <th className="p-4 text-right">
+              Especiales
+            </th>
+
+            <th className="p-4 text-right">
+              Por ganar
+            </th>
+
+            <th className="p-4 text-right">
+              Techo
             </th>
 
             <th className="p-4 text-right">
@@ -150,6 +166,33 @@ export default function RankingTable({
 
                   <td className="p-4 text-right font-bold text-slate-900">
                     {player.puntos}
+                  </td>
+
+                  <td className="p-4 text-right text-slate-700">
+                    {player.puntosPartidos}
+                  </td>
+
+                  <td className="p-4 text-right font-semibold text-[#8B1538]">
+                    {player.puntosEspeciales}
+                  </td>
+
+                  <td className="p-4 text-right text-emerald-700">
+                    <span className="font-semibold">
+                      +{player.puntosPosibles}
+                    </span>
+                    {player.especialesDesconocidos > 0 && (
+                      <span
+                        className="ml-1 text-amber-600"
+                        title={`${player.especialesDesconocidos} especiales sin estado`}
+                        aria-label={`${player.especialesDesconocidos} especiales sin estado`}
+                      >
+                        ⚠
+                      </span>
+                    )}
+                  </td>
+
+                  <td className="p-4 text-right font-bold text-slate-900">
+                    {player.techoPuntos}
                   </td>
 
                   <td className="p-4 text-right text-slate-700">

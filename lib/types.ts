@@ -52,6 +52,13 @@ export interface RankingEntry {
   participanteId: number;
   nombre: string;
   puntos: number;
+  puntosPartidos: number;
+  puntosEspeciales: number;
+  puntosPosiblesPartidos: number;
+  puntosPosiblesEspeciales: number;
+  puntosPosibles: number;
+  techoPuntos: number;
+  especialesDesconocidos: number;
   exactos: number;
   resultados: number;
   cambioPosicion?: number;

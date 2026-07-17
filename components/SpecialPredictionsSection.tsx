@@ -3,6 +3,7 @@
 import {
   SpecialPredictionCategory,
   SpecialPredictionPlayer,
+  getOpenSpecialPoints,
 } from "@/lib/specialPredictions";
 import { Scorer } from "@/lib/types";
 import { useState } from "react";
@@ -10,6 +11,20 @@ import { useState } from "react";
 interface Props {
   categories: SpecialPredictionCategory[];
   scorers: Scorer[];
+}
+
+interface ParticipantSpecialPrediction {
+  categoryKey: string;
+  categoryLabel: string;
+  points: number;
+  value: string;
+  status: SpecialPredictionPlayer["status"];
+}
+
+interface ParticipantSpecialSummary {
+  participantId: string;
+  name: string;
+  predictions: ParticipantSpecialPrediction[];
 }
 
 function getStatusTone(
@@ -27,7 +42,7 @@ function getStatusTone(
     return "bg-red-100 text-red-700 line-through";
   }
 
-  return "bg-slate-100 text-slate-600";
+  return "bg-amber-100 text-amber-800 ring-1 ring-amber-300";
 }
 
 function getGroupTone(
@@ -92,16 +107,207 @@ function getStatusLabel(
     return "fuera";
   }
 
-  return "pendiente";
+  return "por revisar";
+}
+
+function buildParticipantSummaries(
+  categories: SpecialPredictionCategory[]
+): ParticipantSpecialSummary[] {
+  const participants = new Map<
+    string,
+    ParticipantSpecialSummary
+  >();
+
+  categories.forEach((category) => {
+    category.groups.forEach((group) => {
+      group.players.forEach((player) => {
+        const summary = participants.get(
+          player.participanteId
+        ) ?? {
+          participantId: player.participanteId,
+          name: player.nombre,
+          predictions: [],
+        };
+
+        summary.predictions.push({
+          categoryKey: category.category.key,
+          categoryLabel: category.category.label,
+          points: category.category.points,
+          value: group.value,
+          status: player.status,
+        });
+        participants.set(
+          player.participanteId,
+          summary
+        );
+      });
+    });
+  });
+
+  return [...participants.values()].sort(
+    (a, b) => {
+      const possibleA = a.predictions
+        .filter(
+          (prediction) =>
+            prediction.status === "alive"
+        )
+        .reduce(
+          (total, prediction) =>
+            total + prediction.points,
+          0
+        );
+      const possibleB = b.predictions
+        .filter(
+          (prediction) =>
+            prediction.status === "alive"
+        )
+        .reduce(
+          (total, prediction) =>
+            total + prediction.points,
+          0
+        );
+
+      return (
+        possibleB - possibleA ||
+        a.name.localeCompare(b.name)
+      );
+    }
+  );
+}
+
+function ParticipantSpecialsView({
+  participants,
+  showEliminated,
+}: {
+  participants: ParticipantSpecialSummary[];
+  showEliminated: boolean;
+}) {
+  return (
+    <div className="grid gap-4 lg:grid-cols-2">
+      {participants.map((participant) => {
+        const visiblePredictions = showEliminated
+          ? participant.predictions
+          : participant.predictions.filter(
+              (prediction) =>
+                prediction.status !== "eliminated"
+            );
+        const confirmedPoints =
+          participant.predictions
+            .filter(
+              (prediction) =>
+                prediction.status === "hit"
+            )
+            .reduce(
+              (total, prediction) =>
+                total + prediction.points,
+              0
+            );
+        const possiblePoints =
+          participant.predictions
+            .filter(
+              (prediction) =>
+                prediction.status === "alive"
+            )
+            .reduce(
+              (total, prediction) =>
+                total + prediction.points,
+              0
+            );
+        const unknownCount =
+          participant.predictions.filter(
+            (prediction) =>
+              prediction.status === "unknown"
+          ).length;
+
+        return (
+          <article
+            key={participant.participantId}
+            className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg"
+          >
+            <div className="flex items-start justify-between gap-3 border-b border-slate-100 p-4">
+              <div>
+                <h3 className="font-extrabold text-slate-900">
+                  {participant.name}
+                </h3>
+                <p className="mt-1 text-xs font-semibold text-slate-500">
+                  {confirmedPoints} ganados · {possiblePoints} por ganar
+                </p>
+              </div>
+              {unknownCount > 0 && (
+                <span className="rounded-full bg-amber-100 px-2 py-1 text-xs font-bold text-amber-800 ring-1 ring-amber-300">
+                  {unknownCount} por revisar
+                </span>
+              )}
+            </div>
+
+            {visiblePredictions.length === 0 ? (
+              <p className="p-4 text-sm text-slate-500">
+                No tiene especiales visibles con este filtro.
+              </p>
+            ) : (
+              <ul className="divide-y divide-slate-100">
+                {visiblePredictions.map(
+                  (prediction) => (
+                    <li
+                      key={prediction.categoryKey}
+                      className="flex items-center justify-between gap-3 p-4"
+                    >
+                      <div className="min-w-0">
+                        <div className="text-xs font-bold uppercase tracking-wide text-slate-500">
+                          {prediction.categoryLabel} · {prediction.points} pts
+                        </div>
+                        <div className="truncate font-semibold text-slate-900">
+                          {prediction.value}
+                        </div>
+                      </div>
+                      <span
+                        className={`shrink-0 rounded-full px-2 py-1 text-xs font-bold ${getStatusTone(
+                          prediction.status
+                        )}`}
+                      >
+                        {getStatusLabel(
+                          prediction.status
+                        )}
+                      </span>
+                    </li>
+                  )
+                )}
+              </ul>
+            )}
+          </article>
+        );
+      })}
+    </div>
+  );
 }
 
 function SpecialCategoryCard({
   item,
+  showEliminated,
 }: {
   item: SpecialPredictionCategory;
+  showEliminated: boolean;
 }) {
+  const visibleGroups = item.groups
+    .map((group) => ({
+      ...group,
+      players: showEliminated
+        ? group.players
+        : group.players.filter(
+            (player) =>
+              player.status !== "eliminated"
+          ),
+    }))
+    .filter(
+      (group) => group.players.length > 0
+    );
   const maxCount =
-    item.groups[0]?.players.length ?? 0;
+    Math.max(
+      0,
+      ...visibleGroups.map(
+        (group) => group.players.length
+      )
+    );
 
   return (
     <article
@@ -134,18 +340,20 @@ function SpecialCategoryCard({
           </div>
 
           <span className="shrink-0 rounded-full bg-white/15 px-3 py-1 text-xs font-bold">
-            {item.groups.length} opciones
+            {visibleGroups.length} opciones
           </span>
         </div>
       </div>
 
-      {item.groups.length === 0 ? (
+      {visibleGroups.length === 0 ? (
         <p className="p-5 text-sm text-slate-500">
-          Sin predicciones capturadas.
+          {item.groups.length === 0
+            ? "Sin predicciones capturadas."
+            : "No quedan opciones visibles con este filtro."}
         </p>
       ) : (
         <div className="space-y-4 p-5 text-slate-900">
-          {item.groups.map((group) => {
+          {visibleGroups.map((group) => {
             const tone =
               getGroupTone(group.players);
             const percentage =
@@ -249,6 +457,11 @@ export default function SpecialPredictionsSection({
     "";
   const [activeCategoryKey, setActiveCategoryKey] =
     useState(defaultCategory);
+  const [showEliminated, setShowEliminated] =
+    useState(false);
+  const [view, setView] = useState<
+    "category" | "participant"
+  >("category");
   const topScorers = scorers
     .filter((scorer) => scorer.jugador)
     .slice(0, 10);
@@ -258,25 +471,152 @@ export default function SpecialPredictionsSection({
         item.category.key ===
         activeCategoryKey
     );
+  const aliveParticipantIds = new Set(
+    categories.flatMap((category) =>
+      category.groups.flatMap((group) =>
+        group.players
+          .filter(
+            (player) =>
+              player.status === "alive"
+          )
+          .map(
+            (player) => player.participanteId
+          )
+      )
+    )
+  );
+  const pointsInPlay =
+    getOpenSpecialPoints(categories);
+  const unknownPredictions = new Set(
+    categories.flatMap((category) =>
+      category.groups.flatMap((group) =>
+        group.players
+          .filter(
+            (player) =>
+              player.status === "unknown"
+          )
+          .map(
+            (player) =>
+              `${category.category.key}:${player.participanteId}`
+          )
+      )
+    )
+  ).size;
   const showScorers =
     activeCategory?.category.key ===
     "goleador";
+  const participantSummaries =
+    buildParticipantSummaries(categories);
 
   return (
     <section className="mt-8 min-w-0 max-w-full">
-      <div className="mb-4">
-        <h2 className="text-2xl font-bold text-slate-900">
-          Predicciones especiales
-        </h2>
-        <p className="mt-1 text-sm text-slate-500">
-          Agrupadas por categoría y cantidad de jugadores.
-        </p>
+      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <h2 className="text-2xl font-bold text-slate-900">
+            Predicciones especiales
+          </h2>
+          <p className="mt-1 text-sm text-slate-500">
+            Agrupadas por categoría y cantidad de jugadores.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          aria-pressed={showEliminated}
+          onClick={() =>
+            setShowEliminated((current) => !current)
+          }
+          className="self-start rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-600 shadow-sm transition hover:bg-slate-50 sm:self-auto"
+        >
+          {showEliminated
+            ? "Ocultar eliminados"
+            : "Mostrar eliminados"}
+        </button>
       </div>
 
-      <div
-        role="tablist"
-        aria-label="Categorías especiales"
-        className="
+      <div className="mb-4 grid gap-3 sm:grid-cols-3">
+        <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4">
+          <div className="text-2xl font-extrabold text-emerald-800">
+            {aliveParticipantIds.size}
+          </div>
+          <div className="text-sm font-semibold text-emerald-700">
+            participantes con opciones vivas
+          </div>
+        </div>
+        <div className="rounded-xl border border-sky-200 bg-sky-50 p-4">
+          <div className="text-2xl font-extrabold text-sky-800">
+            {pointsInPlay}
+          </div>
+          <div className="text-sm font-semibold text-sky-700">
+            puntos en categorías abiertas
+          </div>
+        </div>
+        <div
+          className={`rounded-xl border p-4 ${
+            unknownPredictions > 0
+              ? "border-amber-200 bg-amber-50"
+              : "border-slate-200 bg-white"
+          }`}
+        >
+          <div
+            className={`text-2xl font-extrabold ${
+              unknownPredictions > 0
+                ? "text-amber-800"
+                : "text-slate-800"
+            }`}
+          >
+            {unknownPredictions}
+          </div>
+          <div
+            className={`text-sm font-semibold ${
+              unknownPredictions > 0
+                ? "text-amber-700"
+                : "text-slate-600"
+            }`}
+          >
+            predicciones por revisar
+          </div>
+        </div>
+      </div>
+
+      <div className="mb-4 flex rounded-lg border border-slate-200 bg-white p-1 shadow-sm sm:w-fit">
+        <button
+          type="button"
+          aria-pressed={view === "category"}
+          onClick={() => setView("category")}
+          className={`flex-1 rounded-md px-4 py-2 text-sm font-bold transition sm:flex-none ${
+            view === "category"
+              ? "bg-[#001F5B] text-white shadow"
+              : "text-slate-600 hover:bg-slate-100"
+          }`}
+        >
+          Por categoría
+        </button>
+        <button
+          type="button"
+          aria-pressed={view === "participant"}
+          onClick={() => setView("participant")}
+          className={`flex-1 rounded-md px-4 py-2 text-sm font-bold transition sm:flex-none ${
+            view === "participant"
+              ? "bg-[#001F5B] text-white shadow"
+              : "text-slate-600 hover:bg-slate-100"
+          }`}
+        >
+          Por participante
+        </button>
+      </div>
+
+      {view === "participant" ? (
+        <ParticipantSpecialsView
+          participants={participantSummaries}
+          showEliminated={showEliminated}
+        />
+      ) : (
+        <>
+          <div
+            role="tablist"
+            aria-label="Categorías especiales"
+            className="
           mb-4
           flex
           gap-2
@@ -290,8 +630,8 @@ export default function SpecialPredictionsSection({
           shadow-lg
           backdrop-blur-sm
         "
-      >
-        {categories.map((item) => {
+          >
+            {categories.map((item) => {
           const isActive =
             item.category.key ===
             activeCategoryKey;
@@ -328,16 +668,16 @@ export default function SpecialPredictionsSection({
               {item.category.label}
             </button>
           );
-        })}
-      </div>
+            })}
+          </div>
 
-      <div
-        className={
-          showScorers
-            ? "grid min-w-0 max-w-full gap-4 xl:grid-cols-2"
-            : ""
-        }
-      >
+          <div
+            className={
+              showScorers
+                ? "grid min-w-0 max-w-full gap-4 xl:grid-cols-2"
+                : ""
+            }
+          >
         {showScorers && (
           <div
             className="
@@ -436,9 +776,12 @@ export default function SpecialPredictionsSection({
         {activeCategory && (
           <SpecialCategoryCard
             item={activeCategory}
+            showEliminated={showEliminated}
           />
         )}
-      </div>
+          </div>
+        </>
+      )}
     </section>
   );
 }

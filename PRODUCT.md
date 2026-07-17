@@ -79,9 +79,9 @@ Total máximo:
 
 ### Especiales
 
-Pendiente de implementar.
+Los especiales resueltos se suman al ranking cuando su estado es `acertado` o la predicción coincide con el resultado oficial.
 
-Valores previstos:
+Valores:
 
 * Campeón: 15
 * Subcampeón: 10
@@ -93,6 +93,10 @@ Valores previstos:
 Total:
 
 43 puntos
+
+Los estados `vivo`, `eliminado`, `pendiente` o desconocido no conceden puntos. Los empates en el ranking se ordenan por total, marcadores exactos, resultados acertados y nombre.
+
+El ranking separa puntos de partidos y especiales. También calcula los puntos todavía posibles y el techo de cada participante; los especiales sin estado conocido se señalan como datos incompletos y no se cuentan silenciosamente.
 
 ### Total torneo
 

@@ -3,14 +3,78 @@ import {
   Prediction,
   Participant,
   RankingEntry,
+  SpecialPrediction,
 } from "./types";
 
 import { calculateMatchPoints } from "./scoring";
+import { buildSpecialPointSummaries } from "./specialPredictions";
+
+function buildPendingMatchPotential(
+  matches: Match[],
+  predictions: Prediction[]
+) {
+  const pendingMatchIds = new Set(
+    matches
+      .filter(
+        (match) =>
+          match.finalizado !== "TRUE"
+      )
+      .map((match) => String(match.id))
+  );
+  const predictedMatchesByParticipant =
+    new Map<string, Set<string>>();
+
+  predictions.forEach((prediction) => {
+    const matchId = String(
+      prediction.partido_id
+    );
+    const hasValidScore =
+      prediction.goles_local !== "" &&
+      prediction.goles_visitante !== "" &&
+      Number.isFinite(
+        Number(prediction.goles_local)
+      ) &&
+      Number.isFinite(
+        Number(prediction.goles_visitante)
+      );
+
+    if (
+      !pendingMatchIds.has(matchId) ||
+      !hasValidScore
+    ) {
+      return;
+    }
+
+    const participantId = String(
+      prediction.participante_id
+    );
+    const predictedMatches =
+      predictedMatchesByParticipant.get(
+        participantId
+      ) ?? new Set<string>();
+
+    predictedMatches.add(matchId);
+    predictedMatchesByParticipant.set(
+      participantId,
+      predictedMatches
+    );
+  });
+
+  return new Map(
+    [...predictedMatchesByParticipant].map(
+      ([participantId, matchIds]) => [
+        participantId,
+        matchIds.size * 2,
+      ]
+    )
+  );
+}
 
 export function buildRanking(
   participants: Participant[],
   matches: Match[],
-  predictions: Prediction[]
+  predictions: Prediction[],
+  specialPredictions: SpecialPrediction[] = []
 ): RankingEntry[] {
 
   const ranking = new Map<
@@ -23,6 +87,13 @@ export function buildRanking(
       participanteId: p.id,
       nombre: p.nombre,
       puntos: 0,
+      puntosPartidos: 0,
+      puntosEspeciales: 0,
+      puntosPosiblesPartidos: 0,
+      puntosPosiblesEspeciales: 0,
+      puntosPosibles: 0,
+      techoPuntos: 0,
+      especialesDesconocidos: 0,
       exactos: 0,
       resultados: 0,
     });
@@ -39,14 +110,6 @@ export function buildRanking(
     ) {
         return;
     }
-
-    const realHome = Number(
-      match.goles_local
-    );
-
-    const realAway = Number(
-      match.goles_visitante
-    );
 
     predictions
       .filter(
@@ -74,7 +137,7 @@ export function buildRanking(
 
         if (!player) return;
 
-        player.puntos +=
+        player.puntosPartidos +=
           result.points;
 
         if (result.exact)
@@ -85,10 +148,51 @@ export function buildRanking(
       });
   });
 
-  
+  const specialSummaries =
+    buildSpecialPointSummaries(
+      participants,
+      specialPredictions
+    );
+  const pendingMatchPotential =
+    buildPendingMatchPotential(
+      matches,
+      predictions
+    );
+
+  ranking.forEach((player, participantId) => {
+    const specialSummary =
+      specialSummaries.get(participantId);
+
+    player.puntosEspeciales =
+      specialSummary?.confirmed ?? 0;
+    player.puntosPosiblesPartidos =
+      pendingMatchPotential.get(
+        participantId
+      ) ?? 0;
+    player.puntosPosiblesEspeciales =
+      specialSummary?.possible ?? 0;
+    player.puntosPosibles =
+      player.puntosPosiblesPartidos +
+      player.puntosPosiblesEspeciales;
+    player.especialesDesconocidos =
+      specialSummary?.unknown ?? 0;
+    player.puntos =
+      player.puntosPartidos +
+      player.puntosEspeciales;
+    player.techoPuntos =
+      player.puntos +
+      player.puntosPosibles;
+  });
+
   return [...ranking.values()]
     .sort(
       (a, b) =>
-        b.puntos - a.puntos
+        b.puntos - a.puntos ||
+        b.exactos - a.exactos ||
+        b.resultados - a.resultados ||
+        a.nombre.localeCompare(
+          b.nombre,
+          "es"
+        )
     );
 }

@@ -29,6 +29,12 @@ export interface SpecialPredictionCategory {
   groups: SpecialPredictionGroup[];
 }
 
+export interface SpecialPointSummary {
+  confirmed: number;
+  possible: number;
+  unknown: number;
+}
+
 export const SPECIAL_CATEGORIES: SpecialCategory[] = [
   {
     key: "campeon",
@@ -384,4 +390,102 @@ export function buildSpecialPredictions(
         ),
     };
   });
+}
+
+export function buildSpecialPointSummaries(
+  participants: Participant[],
+  predictions: SpecialPrediction[]
+): Map<string, SpecialPointSummary> {
+  const summaries = new Map<
+    string,
+    SpecialPointSummary
+  >();
+
+  participants.forEach((participant) => {
+    summaries.set(
+      String(participant.id),
+      {
+        confirmed: 0,
+        possible: 0,
+        unknown: 0,
+      }
+    );
+  });
+
+  buildSpecialPredictions(
+    participants,
+    predictions
+  ).forEach((category) => {
+    const statuses = new Map<
+      string,
+      SpecialPredictionPlayer["status"]
+    >();
+    const statusPriority: Record<
+      SpecialPredictionPlayer["status"],
+      number
+    > = {
+      hit: 3,
+      alive: 2,
+      eliminated: 1,
+      unknown: 0,
+    };
+
+    category.groups.forEach((group) => {
+      group.players.forEach((player) => {
+        const currentStatus = statuses.get(
+          player.participanteId
+        );
+
+        if (
+          currentStatus == null ||
+          statusPriority[player.status] >
+            statusPriority[currentStatus]
+        ) {
+          statuses.set(
+            player.participanteId,
+            player.status
+          );
+        }
+      });
+    });
+
+    statuses.forEach((status, participantId) => {
+      const summary = summaries.get(
+        participantId
+      );
+
+      if (!summary) {
+        return;
+      }
+
+      if (status === "hit") {
+        summary.confirmed +=
+          category.category.points;
+      } else if (status === "alive") {
+        summary.possible +=
+          category.category.points;
+      } else if (status === "unknown") {
+        summary.unknown += 1;
+      }
+    });
+  });
+
+  return summaries;
+}
+
+export function getOpenSpecialPoints(
+  categories: SpecialPredictionCategory[]
+) {
+  return categories.reduce(
+    (total, category) =>
+      category.groups.some((group) =>
+        group.players.some(
+          (player) =>
+            player.status === "alive"
+        )
+      )
+        ? total + category.category.points
+        : total,
+    0
+  );
 }
