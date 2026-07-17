@@ -89,7 +89,7 @@ export default function DashboardTabs({
                 transition
                 ${
                   isActive
-                    ? "bg-[#001F5B] text-white shadow"
+                    ? "bg-[#17104F] text-white shadow ring-1 ring-[#42E8D0]/50"
                     : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
                 }
               `}

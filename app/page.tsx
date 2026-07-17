@@ -41,6 +41,9 @@ import {
 } from "@/lib/specialPredictions";
 import { Analytics } from "@vercel/analytics/next"
 import { SpeedInsights } from "@vercel/speed-insights/next"
+import Image from "next/image";
+import patoMerlin from "@/pato_merlin.jpg";
+import fifaLogo from "@/fifa_logo.jpg";
 
 export const revalidate = 60;
 
@@ -168,14 +171,38 @@ export default async function Home() {
     p-4
     md:p-8
     ">
-      <div className="mb-10 text-center">
-        <h1 className="text-4xl md:text-6xl font-extrabold text-slate-900">
-          🏆 Quiniela Mundial 2026
-        </h1>
+      <div className="mb-10 flex flex-col items-center justify-center gap-5 text-center lg:flex-row lg:text-left">
+        <div className="relative h-28 w-28 shrink-0 overflow-hidden rounded-3xl border-4 border-white bg-white shadow-xl ring-1 ring-slate-200 md:h-36 md:w-36">
+          <Image
+            src={patoMerlin}
+            alt="Pato Merlín, mascota de la Quiniela Mundial 2026"
+            fill
+            preload
+            sizes="(max-width: 768px) 112px, 144px"
+            className="object-cover object-[center_38%]"
+          />
+        </div>
 
-        <p className="mt-3 text-lg text-slate-500">
-          Ranking en tiempo real
-        </p>
+        <div>
+          <h1 className="text-4xl font-extrabold text-slate-900 md:text-6xl">
+            🏆 Quiniela Mundial 2026
+          </h1>
+
+          <p className="mt-3 text-lg text-slate-500">
+            Ranking en tiempo real
+          </p>
+        </div>
+
+        <div className="relative h-24 w-40 shrink-0 overflow-hidden rounded-3xl border-4 border-white bg-white shadow-xl ring-1 ring-violet-200 md:h-28 md:w-48">
+          <Image
+            src={fifaLogo}
+            alt="Emblema visual del Mundial 2026"
+            fill
+            preload
+            sizes="(max-width: 768px) 160px, 192px"
+            className="object-cover"
+          />
+        </div>
       </div>
 
       <div className="mt-8 mb-8">

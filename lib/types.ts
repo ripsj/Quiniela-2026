@@ -58,6 +58,9 @@ export interface RankingEntry {
   puntosPosiblesEspeciales: number;
   puntosPosibles: number;
   techoPuntos: number;
+  distanciaLider: number;
+  puedeAlcanzarLider: boolean | null;
+  eliminadoMatematicamente: boolean;
   especialesDesconocidos: number;
   exactos: number;
   resultados: number;

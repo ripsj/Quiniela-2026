@@ -76,7 +76,7 @@ Criterio de terminado: nunca se presenta un estado desconocido como si estuviera
 
 ### 3. Calcular los puntos todavía en juego
 
-Estado: en progreso. El ranking ya muestra puntos confirmados, puntos por ganar y techo; falta representar la distancia al líder y la eliminación matemática.
+Estado: implementado.
 
 Este cálculo debe ser determinista, no una probabilidad.
 
@@ -92,5 +92,4 @@ Por participante se mostrará:
 Para especiales, solo cuenta como posible el estado `pendiente`; un estado desconocido debe aparecer como dato incompleto y no alimentar el cálculo silenciosamente.
 
 Criterio de terminado: cada cifra ofrece un desglose comprensible y no mezcla puntos confirmados con puntos potenciales.
-
 

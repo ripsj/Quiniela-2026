@@ -289,7 +289,7 @@ export default function MatchPredictionsTable({
               transition
               ${
                 selectedScope === "today"
-                  ? "bg-[#001F5B] text-white shadow"
+                  ? "bg-[#17104F] text-white shadow ring-1 ring-[#42E8D0]/50"
                   : "text-slate-600 hover:bg-white hover:text-slate-900"
               }
             `}
@@ -370,15 +370,16 @@ export default function MatchPredictionsTable({
             <tr
               className="
                 bg-gradient-to-r
-                from-[#001F5B]
-                to-[#8B1538]
+                from-[#17104F]
+                via-[#6D16E8]
+                to-[#ED1B0C]
                 text-white
               "
             >
-              <th className="sticky left-0 top-0 z-50 w-12 min-w-12 max-w-12 bg-[#001F5B] px-2 py-4 text-center after:absolute after:inset-y-0 after:right-[-2px] after:w-1 after:bg-[#001F5B] sm:w-16 sm:min-w-16 sm:max-w-16 sm:p-4">
+              <th className="sticky left-0 top-0 z-50 w-12 min-w-12 max-w-12 bg-[#17104F] px-2 py-4 text-center after:absolute after:inset-y-0 after:right-[-2px] after:w-1 after:bg-[#17104F] sm:w-16 sm:min-w-16 sm:max-w-16 sm:p-4">
                 #
               </th>
-              <th className="sticky left-12 top-0 z-50 w-32 min-w-32 max-w-32 bg-[#001F5B] px-3 py-4 text-left after:absolute after:inset-y-0 after:right-[-4px] after:w-2 after:bg-[#001F5B] sm:left-16 sm:w-48 sm:min-w-48 sm:max-w-48 sm:p-4 md:w-56 md:min-w-56 md:max-w-56">
+              <th className="sticky left-12 top-0 z-50 w-32 min-w-32 max-w-32 bg-[#17104F] px-3 py-4 text-left after:absolute after:inset-y-0 after:right-[-4px] after:w-2 after:bg-[#17104F] sm:left-16 sm:w-48 sm:min-w-48 sm:max-w-48 sm:p-4 md:w-56 md:min-w-56 md:max-w-56">
                 Jugador
               </th>
               {visibleRows.map((row) => {

@@ -12,9 +12,6 @@ interface Props {
 export default function RankingTable({
   ranking,
 }: Props) {
-  const leaderPoints =
-    ranking[0]?.puntos ?? 0;
-
   return (
     <div
       className="
@@ -30,8 +27,9 @@ export default function RankingTable({
       <table className="min-w-[900px] w-full">
         <thead>
           <tr className="bg-gradient-to-r
-            from-[#001F5B]
-            to-[#8B1538]
+            from-[#17104F]
+            via-[#6D16E8]
+            to-[#ED1B0C]
             text-white">
             <th className="p-4 text-left">
               #
@@ -172,7 +170,7 @@ export default function RankingTable({
                     {player.puntosPartidos}
                   </td>
 
-                  <td className="p-4 text-right font-semibold text-[#8B1538]">
+                  <td className="p-4 text-right font-semibold text-[#6D16E8]">
                     {player.puntosEspeciales}
                   </td>
 
@@ -204,8 +202,9 @@ export default function RankingTable({
                   </td>
 
                   <td className="p-4 text-right text-slate-500">
-                    {player.puntos -
-                      leaderPoints}
+                    {player.distanciaLider === 0
+                      ? "Líder"
+                      : `-${player.distanciaLider} pts`}
                   </td>
                   <td className="
                   p-3

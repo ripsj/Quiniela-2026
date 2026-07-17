@@ -416,7 +416,7 @@ function SpecialCategoryCard({
         backdrop-blur-sm
       "
     >
-      <div className="bg-gradient-to-r from-[#001F5B] to-[#8B1538] p-5 text-white">
+      <div className="bg-gradient-to-r from-[#17104F] via-[#6D16E8] to-[#ED1B0C] p-5 text-white">
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">
             <h3 className="text-xl font-extrabold">
@@ -649,7 +649,7 @@ export default function SpecialPredictionsSection({
           onClick={() => setView("category")}
           className={`flex-1 rounded-md px-4 py-2 text-sm font-bold transition sm:flex-none ${
             view === "category"
-              ? "bg-[#001F5B] text-white shadow"
+              ? "bg-[#17104F] text-white shadow ring-1 ring-[#42E8D0]/50"
               : "text-slate-600 hover:bg-slate-100"
           }`}
         >
@@ -661,7 +661,7 @@ export default function SpecialPredictionsSection({
           onClick={() => setView("participant")}
           className={`flex-1 rounded-md px-4 py-2 text-sm font-bold transition sm:flex-none ${
             view === "participant"
-              ? "bg-[#001F5B] text-white shadow"
+              ? "bg-[#17104F] text-white shadow ring-1 ring-[#42E8D0]/50"
               : "text-slate-600 hover:bg-slate-100"
           }`}
         >
@@ -723,7 +723,7 @@ export default function SpecialPredictionsSection({
                 transition
                 ${
                   isActive
-                    ? "bg-[#001F5B] text-white shadow"
+                    ? "bg-[#17104F] text-white shadow ring-1 ring-[#42E8D0]/50"
                     : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
                 }
               `}
@@ -755,7 +755,7 @@ export default function SpecialPredictionsSection({
               backdrop-blur-sm
             "
           >
-            <div className="bg-gradient-to-r from-[#001F5B] via-[#8B1538] to-[#001F5B] p-5 text-white">
+            <div className="bg-gradient-to-r from-[#17104F] via-[#6D16E8] to-[#ED1B0C] p-5 text-white">
               <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
                 <div>
                   <h3 className="text-xl font-extrabold">
@@ -819,7 +819,7 @@ export default function SpecialPredictionsSection({
                           <td className="hidden p-2 text-slate-600 sm:table-cell sm:p-3">
                             {scorer.equipo}
                           </td>
-                          <td className="p-2 text-right text-lg font-extrabold text-[#8B1538] sm:p-3">
+                          <td className="p-2 text-right text-lg font-extrabold text-[#6D16E8] sm:p-3">
                             {scorer.goles}
                           </td>
                           <td className="hidden p-2 text-right text-slate-600 sm:table-cell sm:p-3">

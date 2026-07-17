@@ -93,6 +93,9 @@ export function buildRanking(
       puntosPosiblesEspeciales: 0,
       puntosPosibles: 0,
       techoPuntos: 0,
+      distanciaLider: 0,
+      puedeAlcanzarLider: null,
+      eliminadoMatematicamente: false,
       especialesDesconocidos: 0,
       exactos: 0,
       resultados: 0,
@@ -184,7 +187,7 @@ export function buildRanking(
       player.puntosPosibles;
   });
 
-  return [...ranking.values()]
+  const sortedRanking = [...ranking.values()]
     .sort(
       (a, b) =>
         b.puntos - a.puntos ||
@@ -195,4 +198,26 @@ export function buildRanking(
           "es"
         )
     );
+  const leaderPoints =
+    sortedRanking[0]?.puntos ?? 0;
+
+  sortedRanking.forEach((player) => {
+    player.distanciaLider = Math.max(
+      0,
+      leaderPoints - player.puntos
+    );
+
+    if (player.especialesDesconocidos > 0) {
+      player.puedeAlcanzarLider = null;
+      player.eliminadoMatematicamente = false;
+      return;
+    }
+
+    player.puedeAlcanzarLider =
+      player.techoPuntos >= leaderPoints;
+    player.eliminadoMatematicamente =
+      !player.puedeAlcanzarLider;
+  });
+
+  return sortedRanking;
 }
