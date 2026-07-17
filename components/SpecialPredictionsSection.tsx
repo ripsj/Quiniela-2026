@@ -156,34 +156,103 @@ function buildParticipantSummaries(
     });
   });
 
-  return [...participants.values()].sort(
-    (a, b) => {
-      const possibleA = a.predictions
-        .filter(
-          (prediction) =>
-            prediction.status === "alive"
-        )
-        .reduce(
-          (total, prediction) =>
-            total + prediction.points,
-          0
-        );
-      const possibleB = b.predictions
-        .filter(
-          (prediction) =>
-            prediction.status === "alive"
-        )
-        .reduce(
-          (total, prediction) =>
-            total + prediction.points,
-          0
-        );
+  return [...participants.values()];
+}
 
-      return (
-        possibleB - possibleA ||
-        a.name.localeCompare(b.name)
+function getParticipantPossiblePoints(
+  participant: ParticipantSpecialSummary
+) {
+  return participant.predictions
+    .filter(
+      (prediction) =>
+        prediction.status === "alive"
+    )
+    .reduce(
+      (total, prediction) =>
+        total + prediction.points,
+      0
+    );
+}
+
+function ParticipantSpecialCard({
+  participant,
+  showEliminated,
+}: {
+  participant: ParticipantSpecialSummary;
+  showEliminated: boolean;
+}) {
+  const visiblePredictions = showEliminated
+    ? participant.predictions
+    : participant.predictions.filter(
+        (prediction) =>
+          prediction.status !== "eliminated"
       );
-    }
+  const confirmedPoints = participant.predictions
+    .filter(
+      (prediction) => prediction.status === "hit"
+    )
+    .reduce(
+      (total, prediction) =>
+        total + prediction.points,
+      0
+    );
+  const possiblePoints =
+    getParticipantPossiblePoints(participant);
+  const unknownCount =
+    participant.predictions.filter(
+      (prediction) =>
+        prediction.status === "unknown"
+    ).length;
+
+  return (
+    <article className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-md">
+      <div className="flex items-start justify-between gap-3 border-b border-slate-100 p-4">
+        <div>
+          <h3 className="font-extrabold text-slate-900">
+            {participant.name}
+          </h3>
+          <p className="mt-1 text-xs font-semibold text-slate-500">
+            {confirmedPoints} ganados · {possiblePoints} por ganar
+          </p>
+        </div>
+        {unknownCount > 0 && (
+          <span className="rounded-full bg-amber-100 px-2 py-1 text-xs font-bold text-amber-800 ring-1 ring-amber-300">
+            {unknownCount} por revisar
+          </span>
+        )}
+      </div>
+
+      {visiblePredictions.length === 0 ? (
+        <p className="p-4 text-sm text-slate-500">
+          No tiene especiales visibles con este filtro.
+        </p>
+      ) : (
+        <ul className="divide-y divide-slate-100">
+          {visiblePredictions.map((prediction) => (
+            <li
+              key={prediction.categoryKey}
+              className="flex items-center justify-between gap-3 p-4"
+            >
+              <div className="min-w-0">
+                <div className="text-xs font-bold uppercase tracking-wide text-slate-500">
+                  {prediction.categoryLabel} · {prediction.points} pts
+                </div>
+                <div className="truncate font-semibold text-slate-900">
+                  {prediction.value}
+                </div>
+              </div>
+              <span
+                className={`shrink-0 rounded-full px-2 py-1 text-xs font-bold ${getStatusTone(
+                  prediction.status
+                )}`}
+              >
+                {getStatusLabel(prediction.status)}
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </article>
   );
 }
 
@@ -194,101 +263,107 @@ function ParticipantSpecialsView({
   participants: ParticipantSpecialSummary[];
   showEliminated: boolean;
 }) {
-  return (
-    <div className="grid gap-4 lg:grid-cols-2">
-      {participants.map((participant) => {
-        const visiblePredictions = showEliminated
-          ? participant.predictions
-          : participant.predictions.filter(
-              (prediction) =>
-                prediction.status !== "eliminated"
-            );
-        const confirmedPoints =
-          participant.predictions
-            .filter(
-              (prediction) =>
-                prediction.status === "hit"
-            )
-            .reduce(
-              (total, prediction) =>
-                total + prediction.points,
-              0
-            );
-        const possiblePoints =
-          participant.predictions
-            .filter(
-              (prediction) =>
-                prediction.status === "alive"
-            )
-            .reduce(
-              (total, prediction) =>
-                total + prediction.points,
-              0
-            );
-        const unknownCount =
-          participant.predictions.filter(
-            (prediction) =>
-              prediction.status === "unknown"
-          ).length;
+  const [sortBy, setSortBy] = useState<
+    "possible" | "name"
+  >("possible");
+  const sortedParticipants = [...participants].sort(
+    (a, b) =>
+      sortBy === "name"
+        ? a.name.localeCompare(b.name)
+        : getParticipantPossiblePoints(b) -
+            getParticipantPossiblePoints(a) ||
+          a.name.localeCompare(b.name)
+  );
+  const participantsAlive = sortedParticipants.filter(
+    (participant) =>
+      getParticipantPossiblePoints(participant) > 0
+  );
+  const participantsWithoutLiveOptions =
+    sortedParticipants.filter(
+      (participant) =>
+        getParticipantPossiblePoints(participant) === 0
+    );
 
-        return (
-          <article
+  const renderGroup = (
+    title: string,
+    description: string,
+    group: ParticipantSpecialSummary[],
+    tone: "alive" | "inactive"
+  ) => (
+    <section>
+      <div className="mb-3 flex items-end justify-between gap-3">
+        <div>
+          <h3 className={`text-lg font-extrabold ${
+            tone === "alive"
+              ? "text-emerald-800"
+              : "text-slate-700"
+          }`}>
+            {title}
+          </h3>
+          <p className="text-sm text-slate-500">
+            {description}
+          </p>
+        </div>
+        <span className="shrink-0 rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-600">
+          {group.length}
+        </span>
+      </div>
+      <div className="grid gap-4 lg:grid-cols-2">
+        {group.map((participant) => (
+          <ParticipantSpecialCard
             key={participant.participantId}
-            className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg"
-          >
-            <div className="flex items-start justify-between gap-3 border-b border-slate-100 p-4">
-              <div>
-                <h3 className="font-extrabold text-slate-900">
-                  {participant.name}
-                </h3>
-                <p className="mt-1 text-xs font-semibold text-slate-500">
-                  {confirmedPoints} ganados · {possiblePoints} por ganar
-                </p>
-              </div>
-              {unknownCount > 0 && (
-                <span className="rounded-full bg-amber-100 px-2 py-1 text-xs font-bold text-amber-800 ring-1 ring-amber-300">
-                  {unknownCount} por revisar
-                </span>
-              )}
-            </div>
+            participant={participant}
+            showEliminated={showEliminated}
+          />
+        ))}
+      </div>
+    </section>
+  );
 
-            {visiblePredictions.length === 0 ? (
-              <p className="p-4 text-sm text-slate-500">
-                No tiene especiales visibles con este filtro.
-              </p>
-            ) : (
-              <ul className="divide-y divide-slate-100">
-                {visiblePredictions.map(
-                  (prediction) => (
-                    <li
-                      key={prediction.categoryKey}
-                      className="flex items-center justify-between gap-3 p-4"
-                    >
-                      <div className="min-w-0">
-                        <div className="text-xs font-bold uppercase tracking-wide text-slate-500">
-                          {prediction.categoryLabel} · {prediction.points} pts
-                        </div>
-                        <div className="truncate font-semibold text-slate-900">
-                          {prediction.value}
-                        </div>
-                      </div>
-                      <span
-                        className={`shrink-0 rounded-full px-2 py-1 text-xs font-bold ${getStatusTone(
-                          prediction.status
-                        )}`}
-                      >
-                        {getStatusLabel(
-                          prediction.status
-                        )}
-                      </span>
-                    </li>
-                  )
-                )}
-              </ul>
-            )}
-          </article>
-        );
-      })}
+  return (
+    <div className="space-y-8">
+      <div className="flex flex-col gap-2 rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <div className="font-bold text-slate-900">
+            {participants.length} participantes
+          </div>
+          <div className="text-sm text-slate-500">
+            Separados según sus opciones confirmadas todavía vivas.
+          </div>
+        </div>
+        <label className="flex items-center gap-2 text-sm font-semibold text-slate-600">
+          Ordenar por
+          <select
+            value={sortBy}
+            onChange={(event) =>
+              setSortBy(
+                event.target.value as
+                  | "possible"
+                  | "name"
+              )
+            }
+            className="rounded-lg border border-slate-200 bg-white px-3 py-2 font-bold text-slate-800"
+          >
+            <option value="possible">
+              Puntos por ganar
+            </option>
+            <option value="name">Nombre</option>
+          </select>
+        </label>
+      </div>
+
+      {renderGroup(
+        "Siguen con opciones",
+        "Ordenados por puntos especiales todavía disponibles.",
+        participantsAlive,
+        "alive"
+      )}
+      {renderGroup(
+        "Sin opciones vivas confirmadas",
+        "Pueden tener datos pendientes de revisión.",
+        participantsWithoutLiveOptions,
+        "inactive"
+      )}
     </div>
   );
 }
