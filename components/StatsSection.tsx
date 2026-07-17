@@ -12,7 +12,7 @@ import StatTooltip from "./StatTooltip";
 import type {
   BestDayStat,
   ExactosStat,
-  LoneWolfStat,
+  ResultsStat,
   StreakStat,
 } from "@/lib/stats";
 import { formatDateKeyForDisplay } from "@/lib/matchDay";
@@ -42,7 +42,7 @@ interface Props {
     masExactos?: StatWithTop5<ExactosStat>;
     mejorRacha?: StatWithTop5<StreakStat>;
     mejorJornada?: StatWithTop5<BestDayStat>;
-    loboSolitario?: StatWithTop5<LoneWolfStat>;
+    masResultados?: StatWithTop5<ResultsStat>;
   };
 }
 
@@ -122,19 +122,19 @@ export default function StatsSection({
       ),
     },
     {
-      id: "lobo-solitario",
-      title: "🐺 Lobo solitario",
+      id: "resultados",
+      title: "🔮 El oráculo",
       tooltip:
-        "Marcadores exactos que solo una persona pronosticó correctamente en ese partido.",
-      winner: stats.loboSolitario?.nombre,
-      summary: `${stats.loboSolitario?.exactosUnicos ?? 0} exactos únicos`,
-      detail: `${stats.loboSolitario?.exactos ?? 0} exactos totales`,
+        "Participante que más veces acertó el ganador o empate durante todo el torneo. Los desempates se resuelven por exactos y puntos de partidos.",
+      winner: stats.masResultados?.nombre,
+      summary: `${stats.masResultados?.resultados ?? 0} resultados acertados`,
+      detail: `${stats.masResultados?.exactos ?? 0} exactos`,
       topRows: topRows(
-        stats.loboSolitario?.top5,
+        stats.masResultados?.top5,
         (item) => ({
           name: item.nombre,
-          value: `${item.exactosUnicos} únicos`,
-          detail: `${item.exactos} exactos totales`,
+          value: `${item.resultados} aciertos`,
+          detail: `${item.exactos} exactos`,
         })
       ),
     },

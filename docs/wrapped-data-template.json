@@ -45,9 +45,9 @@
       "points": null,
       "date": null
     },
-    "loneWolf": {
+    "oracle": {
       "names": [],
-      "uniqueExactScores": null
+      "correctResults": null
     }
   },
   "specials": {

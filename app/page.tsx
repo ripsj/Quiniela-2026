@@ -212,10 +212,9 @@ export default async function Home() {
       points: stats.mejorJornada?.puntos ?? 0,
       date: stats.mejorJornada?.fecha ?? "",
     },
-    loneWolf: {
-      name: stats.loboSolitario?.nombre ?? "Por definir",
-      value:
-        stats.loboSolitario?.exactosUnicos ?? 0,
+    oracle: {
+      name: stats.masResultados?.nombre ?? "Por definir",
+      value: stats.masResultados?.resultados ?? 0,
     },
     championHitCount,
   };

@@ -1,6 +1,10 @@
 "use client";
 
 import {
+  ChevronLeft,
+  ChevronRight,
+  Pause,
+  Play,
   Volume2,
   VolumeX,
   X,
@@ -41,7 +45,7 @@ export interface WrappedSummary {
     points: number;
     date: string;
   };
-  loneWolf: {
+  oracle: {
     name: string;
     value: number;
   };
@@ -58,6 +62,42 @@ interface Scene {
   eyebrow: string;
   content: ReactNode;
   tone: string;
+}
+
+const VISUAL_POSITIONS = {
+  trophy: "0% 0%",
+  championDuck: "33.333% 0%",
+  treasureDuck: "66.666% 0%",
+  exactScore: "100% 0%",
+  streak: "0% 100%",
+  bestDay: "33.333% 100%",
+  oracle: "66.666% 100%",
+  closingDuck: "100% 100%",
+} as const;
+
+function WrappedVisual({
+  visual,
+  label,
+  size = "large",
+}: {
+  visual: keyof typeof VISUAL_POSITIONS;
+  label: string;
+  size?: "medium" | "large";
+}) {
+  return (
+    <div
+      role="img"
+      aria-label={label}
+      className={`mx-auto rounded-3xl bg-[url('/wrapped-visuals-v4.png')] bg-[length:400%_200%] bg-no-repeat shadow-2xl ring-1 ring-white/30 ${
+        size === "large"
+          ? "h-40 w-40 sm:h-60 sm:w-60"
+          : "h-28 w-28 sm:h-40 sm:w-40"
+      }`}
+      style={{
+        backgroundPosition: VISUAL_POSITIONS[visual],
+      }}
+    />
+  );
 }
 
 function formatDate(dateKey: string) {
@@ -81,16 +121,42 @@ export default function WrappedVideoIntro({
   const audioRef = useRef<HTMLAudioElement>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
-  const [hasAudio, setHasAudio] = useState(!dryRun);
+  const [hasAudio, setHasAudio] = useState(true);
+  const [isPaused, setIsPaused] = useState(false);
   const [sceneIndex, setSceneIndex] = useState(0);
-  const sceneDuration = dryRun ? 3500 : 6000;
+  const podiumDisplay = [
+    data.podium[1] && {
+      ...data.podium[1],
+      position: 2,
+    },
+    data.podium[0] && {
+      ...data.podium[0],
+      position: 1,
+    },
+    data.podium[2] && {
+      ...data.podium[2],
+      position: 3,
+    },
+  ].filter(
+    (
+      player
+    ): player is {
+      name: string;
+      points: number;
+      position: number;
+    } => Boolean(player)
+  );
   const scenes: Scene[] = [
     {
       eyebrow: "El torneo que vivimos juntos",
       tone: "from-[#17104F] via-[#2754FF] to-[#6D16E8]",
       content: (
         <>
-          <div className="text-6xl sm:text-8xl">🏆</div>
+          <WrappedVisual
+            visual="trophy"
+            label="Copa dorada rodeada de formas de colores"
+            size="medium"
+          />
           <h2 className="mt-5 text-4xl font-black uppercase leading-none sm:text-7xl">
             Quiniela Mundial 2026
           </h2>
@@ -124,7 +190,10 @@ export default function WrappedVideoIntro({
       tone: "from-[#17104F] via-[#6D16E8] to-[#ED1B0C]",
       content: (
         <>
-          <div className="text-6xl sm:text-8xl">⭐</div>
+          <WrappedVisual
+            visual="trophy"
+            label="Copa del campeonato mundial"
+          />
           <div className="mt-5 text-5xl font-black uppercase sm:text-8xl">
             {data.worldChampion}
           </div>
@@ -136,7 +205,11 @@ export default function WrappedVideoIntro({
       tone: "from-[#ED1B0C] via-[#6D16E8] to-[#17104F]",
       content: (
         <>
-          <div className="text-6xl">👑</div>
+          <WrappedVisual
+            visual="championDuck"
+            label="Pato Merlín celebrando con una corona"
+            size="medium"
+          />
           <div className="mt-4 text-5xl font-black sm:text-8xl">
             {data.winner.name}
           </div>
@@ -150,26 +223,36 @@ export default function WrappedVideoIntro({
       eyebrow: "El podio final",
       tone: "from-[#17104F] via-[#2754FF] to-[#6D16E8]",
       content: (
-        <div className="flex items-end justify-center gap-2 sm:gap-5">
-          {data.podium.map((player, index) => (
-            <div
-              key={player.name}
-              className={`w-28 rounded-t-3xl bg-white/15 p-4 backdrop-blur sm:w-48 ${
-                index === 0 ? "pb-14 sm:pb-20" :
-                index === 1 ? "pb-9 sm:pb-12" : "pb-5 sm:pb-7"
-              }`}
-            >
-              <div className="text-3xl">
-                {index === 0 ? "🥇" : index === 1 ? "🥈" : "🥉"}
+        <div>
+          <WrappedVisual
+            visual="treasureDuck"
+            label="Pato Merlín celebrando sobre monedas y billetes"
+            size="medium"
+          />
+          <div className="mt-5 flex items-end justify-center gap-2 sm:gap-5">
+            {podiumDisplay.map((player) => (
+              <div
+                key={player.name}
+                className={`w-28 rounded-t-3xl bg-white/15 p-4 backdrop-blur sm:w-48 ${
+                  player.position === 1
+                    ? "pb-12 sm:pb-20"
+                    : player.position === 2
+                    ? "pb-8 sm:pb-12"
+                    : "pb-5 sm:pb-8"
+                }`}
+              >
+                <div className="text-xl font-black text-white/60">
+                  {player.position}
+                </div>
+                <div className="mt-2 truncate text-lg font-black sm:text-2xl">
+                  {player.name}
+                </div>
+                <div className="text-sm font-bold text-white/70 sm:text-lg">
+                  {player.points} pts
+                </div>
               </div>
-              <div className="mt-2 truncate text-lg font-black sm:text-2xl">
-                {player.name}
-              </div>
-              <div className="text-sm font-bold text-white/70 sm:text-lg">
-                {player.points} pts
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       ),
     },
@@ -178,7 +261,11 @@ export default function WrappedVideoIntro({
       tone: "from-[#6D16E8] via-[#ED1B0C] to-[#FF7A00]",
       content: (
         <>
-          <div className="text-7xl">🎯</div>
+          <WrappedVisual
+            visual="exactScore"
+            label="Balón golpeando el centro de una diana"
+            size="medium"
+          />
           <div className="mt-4 text-5xl font-black sm:text-8xl">
             {data.exactScores.name}
           </div>
@@ -193,7 +280,11 @@ export default function WrappedVideoIntro({
       tone: "from-[#17104F] via-[#2754FF] to-[#42E8D0]",
       content: (
         <>
-          <div className="text-7xl">🔥</div>
+          <WrappedVisual
+            visual="streak"
+            label="Tarjetas de partidos avanzando entre llamas"
+            size="medium"
+          />
           <div className="mt-4 text-5xl font-black sm:text-8xl">
             {data.streak.name}
           </div>
@@ -208,7 +299,11 @@ export default function WrappedVideoIntro({
       tone: "from-[#2754FF] via-[#6D16E8] to-[#ED1B0C]",
       content: (
         <>
-          <div className="text-7xl">🚀</div>
+          <WrappedVisual
+            visual="bestDay"
+            label="Calendario despegando como un cohete"
+            size="medium"
+          />
           <div className="mt-4 text-5xl font-black sm:text-8xl">
             {data.bestDay.name}
           </div>
@@ -219,16 +314,20 @@ export default function WrappedVideoIntro({
       ),
     },
     {
-      eyebrow: "Nadie más lo vio venir",
+      eyebrow: "El oráculo",
       tone: "from-[#17104F] via-[#6D16E8] to-[#B20724]",
       content: (
         <>
-          <div className="text-7xl">🐺</div>
+          <WrappedVisual
+            visual="oracle"
+            label="Balón-oráculo anticipando resultados de partidos"
+            size="medium"
+          />
           <div className="mt-4 text-5xl font-black sm:text-8xl">
-            {data.loneWolf.name}
+            {data.oracle.name}
           </div>
           <div className="mt-3 text-2xl font-bold sm:text-4xl">
-            {data.loneWolf.value} exactos únicos
+            {data.oracle.value} resultados acertados
           </div>
         </>
       ),
@@ -238,7 +337,10 @@ export default function WrappedVideoIntro({
       tone: "from-[#B7E600] via-[#42E8D0] to-[#2754FF]",
       content: (
         <>
-          <div className="text-7xl">🦆</div>
+          <WrappedVisual
+            visual="closingDuck"
+            label="Pato Merlín despidiéndose entre confeti"
+          />
           <div className="mt-5 text-4xl font-black uppercase sm:text-7xl">
             Gracias por jugar
           </div>
@@ -249,6 +351,14 @@ export default function WrappedVideoIntro({
       ),
     },
   ];
+  const defaultSceneDuration = dryRun ? 3500 : 6000;
+  const isFirstScene = sceneIndex === 0;
+  const isLastScene = sceneIndex === scenes.length - 1;
+  const currentSceneDuration = isFirstScene
+    ? 5000
+    : isLastScene
+      ? 10000
+      : defaultSceneDuration;
 
   useEffect(() => {
     if (!enabled && !dryRun) return;
@@ -280,28 +390,46 @@ export default function WrappedVideoIntro({
 
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-    const sceneTimer = window.setInterval(() => {
-      setSceneIndex((current) => {
-        if (current >= scenes.length - 1) {
-          window.clearInterval(sceneTimer);
-          window.setTimeout(() => setIsOpen(false), 900);
-          return current;
-        }
+    const audio = audioRef.current;
 
-        return current + 1;
-      });
-    }, sceneDuration);
+    if (audio) {
+      audio.currentTime = 0;
+      audio.muted = true;
+      void audio.play().catch(() => undefined);
+    }
 
     return () => {
       document.body.style.overflow = previousOverflow;
-      window.clearInterval(sceneTimer);
     };
-  }, [isOpen, sceneDuration, scenes.length]);
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen || isPaused) return;
+
+    const sceneTimer = window.setTimeout(() => {
+      if (sceneIndex >= scenes.length - 1) {
+        setIsOpen(false);
+        audioRef.current?.pause();
+        return;
+      }
+
+      setSceneIndex((current) => current + 1);
+    }, currentSceneDuration);
+
+    return () => window.clearTimeout(sceneTimer);
+  }, [
+    isOpen,
+    isPaused,
+    currentSceneDuration,
+    sceneIndex,
+    scenes.length,
+  ]);
 
   if (!enabled && !dryRun) return null;
 
   function closeWrapped() {
     audioRef.current?.pause();
+    setIsPaused(false);
     setIsOpen(false);
   }
 
@@ -321,9 +449,33 @@ export default function WrappedVideoIntro({
   }
 
   function replayWrapped() {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+      audioRef.current.muted = true;
+    }
+
     setSceneIndex(0);
     setIsMuted(true);
+    setIsPaused(false);
     setIsOpen(true);
+  }
+
+  function previousScene() {
+    setSceneIndex((current) => Math.max(0, current - 1));
+  }
+
+  function nextScene() {
+    if (sceneIndex >= scenes.length - 1) {
+      closeWrapped();
+      return;
+    }
+
+    setSceneIndex((current) => current + 1);
+  }
+
+  function togglePlayback() {
+    setIsPaused((current) => !current);
   }
 
   const scene = scenes[sceneIndex];
@@ -392,7 +544,7 @@ export default function WrappedVideoIntro({
                 }}
               />
             </div>
-            <div className="flex items-center justify-between">
+            <div className="flex flex-wrap items-center justify-between gap-3">
               <button
                 type="button"
                 onClick={toggleSound}
@@ -410,6 +562,43 @@ export default function WrappedVideoIntro({
                   ? "Activar sonido"
                   : "Silenciar"}
               </button>
+
+              <div className="order-first flex w-full items-center justify-center gap-2 sm:order-none sm:w-auto">
+                <button
+                  type="button"
+                  onClick={previousScene}
+                  disabled={sceneIndex === 0}
+                  aria-label="Escena anterior"
+                  className="rounded-full bg-black/20 p-3 backdrop-blur transition hover:bg-black/35 disabled:cursor-not-allowed disabled:opacity-35"
+                >
+                  <ChevronLeft className="h-5 w-5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={togglePlayback}
+                  aria-label={
+                    isPaused
+                      ? "Reanudar Wrapped"
+                      : "Pausar Wrapped"
+                  }
+                  className="rounded-full bg-white p-3 text-[#17104F] shadow-lg transition hover:scale-105"
+                >
+                  {isPaused ? (
+                    <Play className="h-5 w-5 fill-current" />
+                  ) : (
+                    <Pause className="h-5 w-5 fill-current" />
+                  )}
+                </button>
+                <button
+                  type="button"
+                  onClick={nextScene}
+                  aria-label="Siguiente escena"
+                  className="rounded-full bg-black/20 p-3 backdrop-blur transition hover:bg-black/35"
+                >
+                  <ChevronRight className="h-5 w-5" />
+                </button>
+              </div>
+
               <button
                 type="button"
                 onClick={closeWrapped}

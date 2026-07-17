@@ -29,10 +29,11 @@ export interface BestDayStat {
   resultados: number;
 }
 
-export interface LoneWolfStat {
+export interface ResultsStat {
   nombre: string;
-  exactosUnicos: number;
+  resultados: number;
   exactos: number;
+  puntosPartidos: number;
 }
 
 function isCompletedMatch(match: Match) {
@@ -80,13 +81,6 @@ export function buildStats(
       prediction,
     ])
   );
-  const participantNames = new Map(
-    participants.map((participant) => [
-      String(participant.id),
-      participant.nombre,
-    ])
-  );
-
   const exactosRanking = [...ranking].sort(
     (a, b) =>
       b.exactos - a.exactos ||
@@ -94,6 +88,22 @@ export function buildStats(
       b.puntosPartidos - a.puntosPartidos ||
       a.nombre.localeCompare(b.nombre, "es")
   );
+  const resultsRanking: ResultsStat[] = [
+    ...ranking,
+  ]
+    .map((entry) => ({
+      nombre: entry.nombre,
+      resultados: entry.resultados,
+      exactos: entry.exactos,
+      puntosPartidos: entry.puntosPartidos,
+    }))
+    .sort(
+      (a, b) =>
+        b.resultados - a.resultados ||
+        b.exactos - a.exactos ||
+        b.puntosPartidos - a.puntosPartidos ||
+        a.nombre.localeCompare(b.nombre, "es")
+    );
 
   const streakRanking: StreakStat[] =
     participants.map((participant) => {
@@ -215,56 +225,6 @@ export function buildStats(
       a.nombre.localeCompare(b.nombre, "es")
   );
 
-  const uniqueExactCounts = new Map<string, number>(
-    participants.map((participant) => [
-      String(participant.id),
-      0,
-    ])
-  );
-
-  completedMatches.forEach((match) => {
-    const exactPredictions = predictions.filter(
-      (prediction) =>
-        String(prediction.partido_id) ===
-          String(match.id) &&
-        Number(prediction.goles_local) ===
-          Number(match.goles_local) &&
-        Number(prediction.goles_visitante) ===
-          Number(match.goles_visitante)
-    );
-
-    if (exactPredictions.length !== 1) return;
-
-    const participantId = String(
-      exactPredictions[0].participante_id
-    );
-    uniqueExactCounts.set(
-      participantId,
-      (uniqueExactCounts.get(participantId) ?? 0) + 1
-    );
-  });
-
-  const loneWolfRanking: LoneWolfStat[] = [
-    ...uniqueExactCounts,
-  ]
-    .map(([participantId, exactosUnicos]) => ({
-      nombre:
-        participantNames.get(participantId) ??
-        `Participante ${participantId}`,
-      exactosUnicos,
-      exactos:
-        ranking.find(
-          (entry) =>
-            String(entry.participanteId) === participantId
-        )?.exactos ?? 0,
-    }))
-    .sort(
-      (a, b) =>
-        b.exactosUnicos - a.exactosUnicos ||
-        b.exactos - a.exactos ||
-        a.nombre.localeCompare(b.nombre, "es")
-    );
-
   return {
     masExactos: {
       ...exactosRanking[0],
@@ -278,9 +238,9 @@ export function buildStats(
       ...bestDayRanking[0],
       top5: bestDayRanking.slice(0, 5),
     },
-    loboSolitario: {
-      ...loneWolfRanking[0],
-      top5: loneWolfRanking.slice(0, 5),
+    masResultados: {
+      ...resultsRanking[0],
+      top5: resultsRanking.slice(0, 5),
     },
   };
 }
