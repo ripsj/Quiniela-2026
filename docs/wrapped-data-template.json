@@ -1,0 +1,60 @@
+{
+  "generatedAt": null,
+  "tournament": {
+    "participants": null,
+    "completedMatches": null,
+    "validPredictions": null,
+    "worldChampion": null
+  },
+  "quiniela": {
+    "winner": {
+      "name": null,
+      "totalPoints": null,
+      "matchPoints": null,
+      "specialPoints": null
+    },
+    "podium": [
+      {
+        "position": 1,
+        "name": null,
+        "points": null
+      },
+      {
+        "position": 2,
+        "name": null,
+        "points": null
+      },
+      {
+        "position": 3,
+        "name": null,
+        "points": null
+      }
+    ]
+  },
+  "awards": {
+    "exactScores": {
+      "names": [],
+      "value": null
+    },
+    "bestStreak": {
+      "names": [],
+      "value": null
+    },
+    "bestDay": {
+      "names": [],
+      "points": null,
+      "date": null
+    },
+    "loneWolf": {
+      "names": [],
+      "uniqueExactScores": null
+    }
+  },
+  "specials": {
+    "championHitCount": null,
+    "specialPointsLeaders": [],
+    "maxSpecialPoints": null,
+    "hasUnknown": null,
+    "hasAlive": null
+  }
+}

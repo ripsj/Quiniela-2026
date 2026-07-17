@@ -40,12 +40,14 @@ import { Analytics } from "@vercel/analytics/next"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import Image from "next/image";
 import tournamentBanner from "@/quiniela-banner.png";
+import WrappedVideoIntro from "@/components/WrappedVideoIntro";
 
 export const revalidate = 60;
 
 export default async function Home() {
-
-  
+  const wrappedDryRun =
+    process.env.NEXT_PUBLIC_WRAPPED_DRY_RUN ===
+    "true";
 
   const [
     participants,
@@ -71,12 +73,30 @@ export default async function Home() {
     ),
   ]);
 
+  const effectiveSpecialPredictionsRows =
+    wrappedDryRun
+      ? specialPredictionsRows.map(
+          (row, index) =>
+            index === 0
+              ? {
+                  ...row,
+                  campeon_resultado: "España",
+                  subcampeon_resultado: "Argentina",
+                  tercer_lugar_resultado: "Francia",
+                  fase_mexico_resultado: "Octavos",
+                  mvp_resultado: "Lamine Yamal",
+                  goleador_resultado: "Kylian Mbappé",
+                }
+              : row
+        )
+      : specialPredictionsRows;
+
   const ranking =
     buildRanking(
       participants,
       matches,
       predictions,
-      specialPredictionsRows
+      effectiveSpecialPredictionsRows
     );
 
   const rankingHistory =
@@ -129,7 +149,7 @@ export default async function Home() {
   const specialPredictions =
   buildSpecialPredictions(
     participants,
-    specialPredictionsRows
+    effectiveSpecialPredictionsRows
   );
 
   const specialPointsInPlay =
@@ -147,8 +167,69 @@ export default async function Home() {
         player.nombre
       ) ?? 0;
   });
+  const championCategory =
+    specialPredictions.find(
+      (category) =>
+        category.category.key === "campeon"
+    );
+  const championHitCount = new Set(
+    championCategory?.groups.flatMap((group) =>
+      group.players
+        .filter((player) => player.status === "hit")
+        .map((player) => player.participanteId)
+    ) ?? []
+  ).size;
+  const wrappedSummary = {
+    participants: participants.length,
+    matches: matches.filter(
+      (match) => match.finalizado === "TRUE"
+    ).length,
+    predictions: predictions.filter(
+      (prediction) =>
+        prediction.goles_local !== "" &&
+        prediction.goles_visitante !== ""
+    ).length,
+    worldChampion:
+      championCategory?.result ?? "Por definir",
+    winner: {
+      name: ranking[0]?.nombre ?? "Por definir",
+      points: ranking[0]?.puntos ?? 0,
+    },
+    podium: ranking.slice(0, 3).map((player) => ({
+      name: player.nombre,
+      points: player.puntos,
+    })),
+    exactScores: {
+      name: stats.masExactos?.nombre ?? "Por definir",
+      value: stats.masExactos?.exactos ?? 0,
+    },
+    streak: {
+      name: stats.mejorRacha?.nombre ?? "Por definir",
+      value: stats.mejorRacha?.racha ?? 0,
+    },
+    bestDay: {
+      name: stats.mejorJornada?.nombre ?? "Por definir",
+      points: stats.mejorJornada?.puntos ?? 0,
+      date: stats.mejorJornada?.fecha ?? "",
+    },
+    loneWolf: {
+      name: stats.loboSolitario?.nombre ?? "Por definir",
+      value:
+        stats.loboSolitario?.exactosUnicos ?? 0,
+    },
+    championHitCount,
+  };
   return (
-    <main className="
+    <>
+      <WrappedVideoIntro
+        data={wrappedSummary}
+        dryRun={wrappedDryRun}
+        enabled={
+          process.env.NEXT_PUBLIC_WRAPPED_ENABLED ===
+          "true"
+        }
+      />
+      <main className="
     relative
     mx-auto
     max-w-7xl
@@ -276,6 +357,7 @@ export default async function Home() {
       />
       <Analytics />
        <SpeedInsights />
-    </main>
+      </main>
+    </>
   );
 }

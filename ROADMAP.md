@@ -93,3 +93,13 @@ Para especiales, solo cuenta como posible el estado `pendiente`; un estado desco
 
 Criterio de terminado: cada cifra ofrece un desglose comprensible y no mezcla puntos confirmados con puntos potenciales.
 
+## Wrapped global — post torneo
+
+Estado: secuencia cinematográfica implementada; audio final pendiente.
+
+- Vídeo global a pantalla completa en la primera visita del dispositivo.
+- Autoplay silenciado compatible con las políticas de navegador.
+- Control para activar sonido, omitir y volver a reproducir.
+- Activación manual mediante `NEXT_PUBLIC_WRAPPED_ENABLED` al finalizar el torneo.
+- Datos generados directamente desde Sheets durante el build.
+- Audio opcional esperado: `public/wrapped-2026.mp3`.
