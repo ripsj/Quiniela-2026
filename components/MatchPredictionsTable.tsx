@@ -4,10 +4,6 @@ import {
   MatchPredictionCell,
   MatchPredictionsRow,
 } from "@/lib/matchPredictions";
-import {
-  getSheetDateKey,
-  getTodayDateKey,
-} from "@/lib/matchDay";
 import { useState } from "react";
 
 interface Props {
@@ -198,9 +194,7 @@ export default function MatchPredictionsTable({
   rows,
 }: Props) {
   const [selectedScope, setSelectedScope] =
-    useState("today");
-  const todayDateKey =
-    getTodayDateKey();
+    useState("all");
   const jornadaIndex =
     buildJornadaIndex(rows);
   const jornadas = [
@@ -217,17 +211,8 @@ export default function MatchPredictionsTable({
     ).values(),
   ];
   const visibleRows =
-    selectedScope === "today"
-      ? rows.filter((row) => {
-          const matchDate =
-            row.match.fecha ||
-            row.match.dia;
-
-          return (
-            getSheetDateKey(matchDate) ===
-            todayDateKey
-          );
-        })
+    selectedScope === "all"
+      ? rows
       : rows.filter(
           (row) =>
             jornadaIndex.get(
@@ -244,7 +229,7 @@ export default function MatchPredictionsTable({
           Todos los partidos y predicciones
         </h2>
         <p className="mt-1 text-sm text-slate-500">
-          Por defecto se muestran los partidos de hoy. Cambia entre jornadas de fase de grupos para revisar otros partidos.
+          Consulta todos los partidos o selecciona una jornada de fase de grupos.
         </p>
       </div>
 
@@ -277,7 +262,7 @@ export default function MatchPredictionsTable({
           <button
             type="button"
             onClick={() =>
-              setSelectedScope("today")
+              setSelectedScope("all")
             }
             className={`
               min-h-10
@@ -288,13 +273,13 @@ export default function MatchPredictionsTable({
               font-semibold
               transition
               ${
-                selectedScope === "today"
+                selectedScope === "all"
                   ? "bg-[#17104F] text-white shadow ring-1 ring-[#42E8D0]/50"
                   : "text-slate-600 hover:bg-white hover:text-slate-900"
               }
             `}
           >
-            Hoy
+            Todos
           </button>
         </div>
 
@@ -302,14 +287,14 @@ export default function MatchPredictionsTable({
           Jornada
           <select
             value={
-              selectedScope === "today"
+              selectedScope === "all"
                 ? ""
                 : selectedScope
             }
             onChange={(event) =>
               setSelectedScope(
                 event.target.value ||
-                  "today"
+                  "all"
               )
             }
             className="
