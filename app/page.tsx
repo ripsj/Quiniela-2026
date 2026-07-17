@@ -25,9 +25,6 @@ from "@/lib/pointsHistory";
 import { buildStats } from "@/lib/stats";
 import { buildRecentForm } from "@/lib/recentForm";
 import StatsSection from "@/components/StatsSection";
-import {
-  buildComebacks,
-} from "@/lib/comebacks";
 import { buildMatchPredictions } from "@/lib/matchPredictions";
 
 import PointsHistoryChart
@@ -102,20 +99,9 @@ export default async function Home() {
     predictions
   );
 
-  const partidosJugados =
-    matches.filter(
-      (m) => m.finalizado === "TRUE"
-    ).length;
-  
-    const comeback =
-    buildComebacks(
-      rankingHistory
-    );
-
   const stats =
   buildStats(
     ranking,
-    partidosJugados,
     matches,
     predictions,
     participants
@@ -278,10 +264,7 @@ export default async function Home() {
       />
 
       <StatsSection
-        stats={{
-          ...stats,
-          comeback
-        }}
+        stats={stats}
       />
 
       <DashboardTabs

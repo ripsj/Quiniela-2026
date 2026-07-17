@@ -10,17 +10,12 @@ import {
 } from "react";
 import StatTooltip from "./StatTooltip";
 import type {
-  DeltaStat,
+  BestDayStat,
   ExactosStat,
-  JugadorDiaStat,
+  LoneWolfStat,
+  StreakStat,
 } from "@/lib/stats";
-
-interface ComebackStat {
-  nombre: string;
-  inicio: number;
-  actual: number;
-  mejora: number;
-}
+import { formatDateKeyForDisplay } from "@/lib/matchDay";
 
 type StatWithTop5<T> = T & {
   top5: T[];
@@ -45,9 +40,9 @@ interface CardConfig {
 interface Props {
   stats: {
     masExactos?: StatWithTop5<ExactosStat>;
-    mejorDelta?: StatWithTop5<DeltaStat>;
-    jugadorDelDia?: StatWithTop5<JugadorDiaStat> | null;
-    comeback?: StatWithTop5<ComebackStat> | null;
+    mejorRacha?: StatWithTop5<StreakStat>;
+    mejorJornada?: StatWithTop5<BestDayStat>;
+    loboSolitario?: StatWithTop5<LoneWolfStat>;
   };
 }
 
@@ -88,58 +83,58 @@ export default function StatsSection({
       ),
     },
     {
-      id: "delta",
-      title: "⚽ Goles predecidos vs reales",
+      id: "racha",
+      title: "🔥 Mejor racha",
       tooltip:
-        "Cantidad de goles predecidos menos los goles del marcador final. Menor valor es mejor.",
-      winner: stats.mejorDelta?.nombre,
-      summary: `${stats.mejorDelta?.totalDelta ?? 0} goles`,
+        "Mayor cantidad de partidos consecutivos acertando el ganador o empate durante todo el torneo.",
+      winner: stats.mejorRacha?.nombre,
+      summary: `${stats.mejorRacha?.racha ?? 0} aciertos seguidos`,
       topRows: topRows(
-        stats.mejorDelta?.top5,
+        stats.mejorRacha?.top5,
         (item) => ({
           name: item.nombre,
-          value: `${item.totalDelta} goles`,
-          detail: `${item.partidos} partidos`,
+          value: `${item.racha} seguidos`,
+          detail: `${item.resultados} en total`,
         })
       ),
     },
     {
-      id: "jugador-dia",
-      title: "🔥 Jugador de ayer",
+      id: "mejor-jornada",
+      title: "🚀 Mejor jornada",
       tooltip:
-        "Participante con más resultados acertados en los partidos finalizados de ayer. Los empates se resuelven con exactos y puntos.",
-      winner: stats.jugadorDelDia?.nombre,
-      summary: `${stats.jugadorDelDia?.resultados ?? 0} aciertos`,
-      detail: `${stats.jugadorDelDia?.exactos ?? 0} exactos`,
+        "Mayor puntuación conseguida por un participante en un solo día de partidos durante todo el torneo.",
+      winner: stats.mejorJornada?.nombre,
+      summary: `${stats.mejorJornada?.puntos ?? 0} puntos`,
+      detail: stats.mejorJornada
+        ? formatDateKeyForDisplay(
+            stats.mejorJornada.fecha
+          )
+        : undefined,
       topRows: topRows(
-        stats.jugadorDelDia?.top5,
+        stats.mejorJornada?.top5,
         (item) => ({
           name: item.nombre,
-          value: `${item.resultados} aciertos`,
-          detail: `${item.exactos} exactos`,
+          value: `${item.puntos} pts`,
+          detail: `${item.exactos} exactos · ${formatDateKeyForDisplay(
+            item.fecha
+          )}`,
         })
       ),
     },
     {
-      id: "comeback",
-      title: "📈 Remontada últimos 10",
+      id: "lobo-solitario",
+      title: "🐺 Lobo solitario",
       tooltip:
-        "Participante que más posiciones ha ganado en el ranking durante los últimos 10 partidos finalizados.",
-      winner: stats.comeback?.nombre,
-      summary:
-        stats.comeback == null
-          ? undefined
-          : `${stats.comeback.inicio}° ➜ ${stats.comeback.actual}°`,
-      detail:
-        stats.comeback == null
-          ? undefined
-          : `+${stats.comeback.mejora}`,
+        "Marcadores exactos que solo una persona pronosticó correctamente en ese partido.",
+      winner: stats.loboSolitario?.nombre,
+      summary: `${stats.loboSolitario?.exactosUnicos ?? 0} exactos únicos`,
+      detail: `${stats.loboSolitario?.exactos ?? 0} exactos totales`,
       topRows: topRows(
-        stats.comeback?.top5,
+        stats.loboSolitario?.top5,
         (item) => ({
           name: item.nombre,
-          value: `+${item.mejora}`,
-          detail: `${item.inicio}° ➜ ${item.actual}°`,
+          value: `${item.exactosUnicos} únicos`,
+          detail: `${item.exactos} exactos totales`,
         })
       ),
     },
@@ -259,11 +254,7 @@ export default function StatsSection({
 
               {card.detail && (
                 <div
-                  className={
-                    card.id === "comeback"
-                      ? "text-sm font-medium text-emerald-600"
-                      : "text-sm text-slate-400"
-                  }
+                  className="text-sm text-slate-400"
                 >
                   {card.detail}
                 </div>
