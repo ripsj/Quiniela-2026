@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  CartesianGrid,
   LineChart,
   Line,
   XAxis,
@@ -214,31 +215,65 @@ export default function RankingHistoryChart({
           <LineChart
             data={data}
             margin={{
-              top: 8,
-              right: 12,
-              left: -18,
-              bottom: 8,
+              top: 12,
+              right: 18,
+              left: -14,
+              bottom: 18,
             }}
           >
+            <CartesianGrid
+              stroke="#e2e8f0"
+              strokeDasharray="3 8"
+              vertical={false}
+            />
 
             <XAxis
               dataKey="partido"
+              axisLine={false}
+              tickLine={false}
+              interval={0}
+              minTickGap={12}
+              tick={{
+                fill: "#64748b",
+                fontSize: 12,
+              }}
             />
 
             <YAxis
               reversed
               allowDecimals={false}
-              width={28}
+              axisLine={false}
+              tickLine={false}
+              width={36}
+              tick={{
+                fill: "#64748b",
+                fontSize: 12,
+              }}
             />
 
             <Tooltip
-            formatter={(value) => [
+              contentStyle={{
+                border: "1px solid #e2e8f0",
+                borderRadius: 12,
+                boxShadow:
+                  "0 12px 32px rgba(15, 23, 42, 0.12)",
+              }}
+              formatter={(value) => [
                 `Posición ${value}`,
                 "",
-            ]}
+              ]}
+              labelStyle={{
+                color: "#0f172a",
+                fontWeight: 700,
+              }}
             />
 
-            <Legend />
+            <Legend
+              iconType="circle"
+              wrapperStyle={{
+                paddingTop: 12,
+              }}
+            />
 
             {players.map(
                 (
@@ -253,10 +288,17 @@ export default function RankingHistoryChart({
                         ]
                     }
                     key={player}
-                    type="monotone"
+                    type="natural"
                     dataKey={player}
-                    strokeWidth={4}
-                    dot
+                    strokeWidth={3.5}
+                    dot={false}
+                    activeDot={{
+                      r: 6,
+                      strokeWidth: 2,
+                      fill: "#fff",
+                    }}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
                 />
               )
             )}

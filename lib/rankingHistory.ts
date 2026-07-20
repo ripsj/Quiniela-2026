@@ -6,6 +6,7 @@ import {
 } from "./types";
 
 import { calculateMatchPoints } from "./scoring";
+import { buildJornadaIndex } from "./pointsHistory";
 import { buildResolvedSpecialPointEvents } from "./specialPredictions";
 
 export function buildRankingHistory(
@@ -23,6 +24,9 @@ export function buildRankingHistory(
       (a, b) =>
         Number(a.id) - Number(b.id)
     );
+
+  const jornadaIndex =
+    buildJornadaIndex(matches);
 
   const scores = new Map<
     string,
@@ -75,55 +79,72 @@ export function buildRankingHistory(
     history.push(row);
   };
 
-  completedMatches.forEach(
-    (match, index) => {
-
-      predictions
-        .filter(
-          (p) =>
+  const applyMatchPoints = (
+    match: Match
+  ) => {
+    predictions
+      .filter(
+        (p) =>
+          Number(p.partido_id) ===
+          Number(match.id)
+      )
+      .forEach((prediction) => {
+        const result =
+          calculateMatchPoints(
+            Number(match.goles_local),
+            Number(match.goles_visitante),
             Number(
-              p.partido_id
-            ) === Number(match.id)
-        )
-        .forEach(
-          (prediction) => {
+              prediction.goles_local
+            ),
+            Number(
+              prediction.goles_visitante
+            )
+          );
 
-            const result =
-              calculateMatchPoints(
-                Number(
-                  match.goles_local
-                ),
-                Number(
-                  match.goles_visitante
-                ),
-                Number(
-                  prediction.goles_local
-                ),
-                Number(
-                  prediction.goles_visitante
-                )
-              );
-
-            const current =
-              scores.get(
-                String(
-                  prediction.participante_id
-                )
-              ) ?? 0;
-
-            scores.set(
-              String(
-                prediction.participante_id
-              ),
-              current +
-                result.points
-            );
-          }
+        const participantId = String(
+          prediction.participante_id
         );
 
-      appendRanking(index + 1);
+        scores.set(
+          participantId,
+          (scores.get(participantId) ?? 0) +
+            result.points
+        );
+      });
+  };
+
+  const jornadas = [
+    ...new Map(
+      [...jornadaIndex.values()]
+        .sort(
+          (a, b) =>
+            a.order - b.order
+        )
+        .map((jornada) => [
+          jornada.value,
+          jornada,
+        ])
+    ).values(),
+  ];
+
+  jornadas.forEach((jornada) => {
+    const jornadaMatches =
+      completedMatches.filter(
+        (match) =>
+          jornadaIndex.get(match.id)
+            ?.value === jornada.value
+      );
+
+    if (!jornadaMatches.length) {
+      return;
     }
-  );
+
+    jornadaMatches.forEach(
+      applyMatchPoints
+    );
+
+    appendRanking(jornada.label);
+  });
 
   const specialEvents =
     buildResolvedSpecialPointEvents(

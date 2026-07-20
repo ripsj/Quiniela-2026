@@ -13,7 +13,7 @@ type PointsHistoryRow = Record<
   string | number
 >;
 
-type Jornada = {
+export type Jornada = {
   value: string;
   label: string;
   order: number;
@@ -42,7 +42,7 @@ function normalizeJornada(
   };
 }
 
-function buildJornadaIndex(
+export function buildJornadaIndex(
   matches: Match[]
 ) {
   const explicit =
