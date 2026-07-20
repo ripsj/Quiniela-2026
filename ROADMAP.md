@@ -95,7 +95,7 @@ Criterio de terminado: cada cifra ofrece un desglose comprensible y no mezcla pu
 
 ## Wrapped global — post torneo
 
-Estado: secuencia cinematográfica implementada; audio final pendiente.
+Estado: implementado.
 
 - Vídeo global a pantalla completa en la primera visita del dispositivo.
 - Autoplay silenciado compatible con las políticas de navegador.
